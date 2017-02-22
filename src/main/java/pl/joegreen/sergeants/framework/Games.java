@@ -22,8 +22,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
-public class GameCoordinator {
-    private final static Logger LOGGER = LoggerFactory.getLogger(GameCoordinator.class);
+public class Games {
+    private final static Logger LOGGER = LoggerFactory.getLogger(Games.class);
     private static final String HELLO_MESSAGE = "Bot created with the Sergeants framework: https://git.io/sergeants";
     private GeneralsApi api = null;
     private Function<Actions, Bot> botProvider;
@@ -45,7 +45,7 @@ public class GameCoordinator {
             throw new IllegalArgumentException("Number of games must be positive");
         }
         CompletableFuture<List<GameResult>> resultsFuture = new CompletableFuture<>();
-        new GameCoordinator(GeneralsApi.createConnection(), games, botProvider, queueConfiguration, userConfiguration, resultsFuture).playRound();
+        new Games(GeneralsApi.createConnection(), games, botProvider, queueConfiguration, userConfiguration, resultsFuture).playRound();
         return resultsFuture;
     }
 
@@ -54,7 +54,7 @@ public class GameCoordinator {
             throw new IllegalArgumentException("Number of games must be positive");
         }
         CompletableFuture<List<GameResult>> resultsFuture = new CompletableFuture<>();
-        new GameCoordinator(api, games, botProvider, queueConfiguration, userConfiguration, resultsFuture).playRound();
+        new Games(api, games, botProvider, queueConfiguration, userConfiguration, resultsFuture).playRound();
         return resultsFuture;
     }
 
@@ -67,8 +67,8 @@ public class GameCoordinator {
         }
     }
 
-    private GameCoordinator(GeneralsApi api, int games, Function<Actions, Bot> botProvider, QueueConfiguration queueConfiguration,
-                            UserConfiguration userConfiguration, CompletableFuture<List<GameResult>> resultsFuture) {
+    private Games(GeneralsApi api, int games, Function<Actions, Bot> botProvider, QueueConfiguration queueConfiguration,
+                  UserConfiguration userConfiguration, CompletableFuture<List<GameResult>> resultsFuture) {
         this.gamesToPlay = games;
         this.botProvider = botProvider;
         this.userConfiguration = userConfiguration;

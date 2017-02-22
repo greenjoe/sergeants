@@ -10,7 +10,7 @@ import org.mockito.Mockito;
 import pl.joegreen.sergeants.api.GeneralsApi;
 import pl.joegreen.sergeants.api.test.FakeSocket;
 import pl.joegreen.sergeants.framework.Bot;
-import pl.joegreen.sergeants.framework.GameCoordinator;
+import pl.joegreen.sergeants.framework.Games;
 import pl.joegreen.sergeants.framework.model.*;
 import pl.joegreen.sergeants.framework.queue.QueueConfiguration;
 import pl.joegreen.sergeants.framework.user.UserConfiguration;
@@ -36,7 +36,7 @@ public class Integration38TurnsTest {
 
     @Before
     public void play() throws IOException, URISyntaxException, ExecutionException, InterruptedException {
-        CompletableFuture<List<GameResult>> future = GameCoordinator.playAsynchronouslyWithCustomApi(fakeGeneralsApi,
+        CompletableFuture<List<GameResult>> future = Games.playAsynchronouslyWithCustomApi(fakeGeneralsApi,
                 1, actions -> bot, QueueConfiguration.customGame(true, "customGame"), UserConfiguration.idAndName("id", "name"));
         TestUtils.readEventsFromClassPathFile("38turnsTest/events").forEach(fakeSocket::injectEvent);
         Assert.assertTrue(future.isDone());
