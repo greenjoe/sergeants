@@ -62,8 +62,10 @@ public class SimpleBorderExpandingBot implements Bot {
 
 ```
 The bot above is very simple - it attacks nearby fields that can be conquered and does nothing if there are no such fields. 
+You can see it in action in this [replay](http://bot.generals.io/replays/HgdiY9sKl) as `95eaec79-9`. 
 The `GameState` class provides a lot of information so it should be easy to add more advanced logic. See the `Actions`
-interface to find out what actions can be performed by the bot. 
+interface to find out what actions can be performed by the bot. An example of a more advanced bot - Java FFA, created using 
+Sergeants, can be seen in action [here](http://bot.generals.io/replays/SxqqAIXte) and [here](http://bot.generals.io/replays/rxnjJFjKx).
 
 
 Create a main class that plays the FFA game (this call uses random user identifier, change `UserConfiguration` to set up the player.
