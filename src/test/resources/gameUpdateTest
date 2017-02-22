@@ -1,0 +1,1 @@
+game_update###{"attackIndex":0,"cities_diff":[0,1,0],"generals":[1,-1,-1],"scores":[{"tiles":1,"total":1,"i":0,"dead":false},{"tiles":2,"total":2,"i":1,"dead":false},{"tiles":0,"total":0,"i":2,"dead":true}],"turn":1,"stars":[41,0,0],"map_diff":[0,10,2,2,1,2,0,0,1,0,-1,-4]}
