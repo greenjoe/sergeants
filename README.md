@@ -72,7 +72,8 @@ Create a main class that plays the FFA game (this call uses random user identifi
 public class MainClass {
     public static void main(String[] args) throws InterruptedException {
 
-        Games.play(1, SimpleBorderExpandingBot::new, QueueConfiguration.freeForAll(false), UserConfiguration.random())
+        Games.play(1, SimpleBorderExpandingBot::new,
+                QueueConfiguration.freeForAll(false), UserConfiguration.random())
                 .forEach(System.out::println);
 
     }
