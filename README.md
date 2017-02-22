@@ -68,7 +68,7 @@ interface to find out what actions can be performed by the bot. An example of a 
 Sergeants, can be seen in action [here](http://bot.generals.io/replays/SxqqAIXte) and [here](http://bot.generals.io/replays/rxnjJFjKx).
 
 
-Create a main class that plays the FFA game (this call uses random user identifier, change `UserConfiguration` to set up the player.
+Create a main class that plays the FFA game (this call uses random user identifier, change `UserConfiguration` to set up the player).
 
 ```java
 public class MainClass {
