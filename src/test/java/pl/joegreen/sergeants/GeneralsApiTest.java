@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 
 public class GeneralsApiTest {
     private FakeSocket fakeSocket = new FakeSocket();
-    private GeneralsApi generalsApi = GeneralsApi.createConnectionWithCustomSocket(fakeSocket);
+    private GeneralsApi generalsApi = GeneralsApi.createWithCustomSocket(fakeSocket);
 
     @Test
     public void shouldSetUsername() {

@@ -29,7 +29,7 @@ import static org.mockito.Matchers.argThat;
 
 public class Integration38TurnsTest {
     private FakeSocket fakeSocket = new FakeSocket();
-    private GeneralsApi fakeGeneralsApi = GeneralsApi.createConnectionWithCustomSocket(fakeSocket);
+    private GeneralsApi fakeGeneralsApi = GeneralsApi.createWithCustomSocket(fakeSocket);
     private Bot bot = Mockito.mock(Bot.class);
     private List<GameResult> gameResults;
 

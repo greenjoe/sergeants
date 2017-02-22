@@ -32,14 +32,14 @@ public class GeneralsApi {
 
     }
 
-    public static GeneralsApi createConnection() {
+    public static GeneralsApi create() {
         return new GeneralsApi(new RealSocket());
     }
 
     /**
      * For testing purposes.
      */
-    public static GeneralsApi createConnectionWithCustomSocket(Socket socket) {
+    public static GeneralsApi createWithCustomSocket(Socket socket) {
         return new GeneralsApi(socket);
     }
 

@@ -45,7 +45,7 @@ public class Games {
             throw new IllegalArgumentException("Number of games must be positive");
         }
         CompletableFuture<List<GameResult>> resultsFuture = new CompletableFuture<>();
-        new Games(GeneralsApi.createConnection(), games, botProvider, queueConfiguration, userConfiguration, resultsFuture).playRound();
+        new Games(GeneralsApi.create(), games, botProvider, queueConfiguration, userConfiguration, resultsFuture).playRound();
         return resultsFuture;
     }
 
