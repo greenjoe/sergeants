@@ -97,5 +97,13 @@ The following example shows how to set the username using the `GeneralsApi` clas
                 generalsApi.setUsername("userId", "userName"));
 ```
 
+# Versions & contributing
+
+Please consider all versions below 1.0 "beta". Beta means that the project is new and wasn't tested in production too much,
+so the probability of discovering bugs and usability issues is higher. It's possible that bigger architecture changes 
+will be needed and the backward interface compatibility with bots written for previous versions may be broken. 
+
+Well-described issues and pull requests are welcome. Please stick to the formatting conventions,
+which are basically Intellij Idea defaults. Lombok plugin may be needed to compile the project in an IDE.
 
 
