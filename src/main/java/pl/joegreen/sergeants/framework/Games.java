@@ -1,5 +1,7 @@
 package pl.joegreen.sergeants.framework;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pl.joegreen.sergeants.api.GeneralsApi;
 import pl.joegreen.sergeants.api.listener.NoArgsListener;
 import pl.joegreen.sergeants.api.response.ChatMessageApiResponse;
@@ -12,8 +14,6 @@ import pl.joegreen.sergeants.framework.model.GameStarted;
 import pl.joegreen.sergeants.framework.model.GameState;
 import pl.joegreen.sergeants.framework.queue.QueueConfiguration;
 import pl.joegreen.sergeants.framework.user.UserConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,6 +112,7 @@ public class Games {
     }
 
     private void onGameFinished(GameResult gameResult) {
+        api.leaveGame();
         if (inGame) {
             inGame = false;
             gamesToPlay--;
@@ -170,15 +171,26 @@ public class Games {
     private void playRound() {
         connectIfNeededAndThen(() -> {
             LOGGER.info("Joining game queue with configuration" + queueConfiguration);
-            queueConfiguration.joinQueue(api, userConfiguration.getUserId());});
+            queueConfiguration.joinQueue(api, userConfiguration.getUserId());
+        });
     }
 
 
     private void onGameUpdated(GameUpdateApiResponse gameUpdateApiResponse) {
         LOGGER.trace("Game update: {}", gameUpdateApiResponse);
         if (currentGameState == null) {
+            if (gameUpdateApiResponse.getTurn() != 1) {
+                LOGGER.warn("Ignoring game update! Expected new game to start and game turn of received game update is not 1. Ignored update: {}", gameUpdateApiResponse);
+                return;
+            }
             currentGameState = GameState.createInitialGameState(gameStartApiResponse, gameUpdateApiResponse);
         } else {
+            int expectedTurnOfGameUpdate = currentGameState.getTurn() + 1;
+            if (gameUpdateApiResponse.getTurn() != expectedTurnOfGameUpdate) {
+                LOGGER.warn("Ignoring game update! Current game state turn is {} and game turn of received game update is not {}. Ignored update: {}",
+                        currentGameState.getTurn(), expectedTurnOfGameUpdate, gameUpdateApiResponse);
+                return;
+            }
             currentGameState = currentGameState.update(gameUpdateApiResponse);
         }
         runBotMethodCatchingExceptions(() -> bot.onGameStateUpdate(currentGameState));
