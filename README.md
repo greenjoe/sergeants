@@ -14,7 +14,7 @@ Add maven dependency
        <dependency>
             <groupId>pl.joegreen</groupId>
             <artifactId>sergeants</artifactId>
-            <version>0.2</version>
+            <version>0.3</version>
         </dependency>
 ```
 
