@@ -8,10 +8,9 @@ import pl.joegreen.sergeants.api.response.ChatMessageApiResponse;
 import pl.joegreen.sergeants.api.response.GameLostApiResponse;
 import pl.joegreen.sergeants.api.response.GameStartApiResponse;
 import pl.joegreen.sergeants.api.response.GameUpdateApiResponse;
-import pl.joegreen.sergeants.framework.model.ChatMessage;
-import pl.joegreen.sergeants.framework.model.GameResult;
-import pl.joegreen.sergeants.framework.model.GameStarted;
-import pl.joegreen.sergeants.framework.model.GameState;
+import pl.joegreen.sergeants.framework.model.*;
+import pl.joegreen.sergeants.framework.model.api.GameStartedApiResponseImpl;
+import pl.joegreen.sergeants.framework.model.api.UpdatableGameState;
 import pl.joegreen.sergeants.framework.queue.QueueConfiguration;
 import pl.joegreen.sergeants.framework.user.UserConfiguration;
 
@@ -28,7 +27,7 @@ public class Games {
     private GeneralsApi api = null;
     private Function<Actions, Bot> botProvider;
     private QueueConfiguration queueConfiguration;
-    private GameState currentGameState;
+    private UpdatableGameState currentGameState;
     private GameStartApiResponse gameStartApiResponse;
     private Bot bot;
     private Actions actions;
@@ -183,7 +182,7 @@ public class Games {
                 LOGGER.warn("Ignoring game update! Expected new game to start and game turn of received game update is not 1. Ignored update: {}", gameUpdateApiResponse);
                 return;
             }
-            currentGameState = GameState.createInitialGameState(gameStartApiResponse, gameUpdateApiResponse);
+            currentGameState = UpdatableGameState.createInitialGameState(gameStartApiResponse, gameUpdateApiResponse);
         } else {
             int expectedTurnOfGameUpdate = currentGameState.getTurn() + 1;
             if (gameUpdateApiResponse.getTurn() != expectedTurnOfGameUpdate) {
@@ -201,7 +200,7 @@ public class Games {
         LOGGER.debug("Game started: {}", gameStartApiResponse);
         this.gameStartApiResponse = gameStartApiResponse;
         bot = botProvider.apply(actions);
-        runBotMethodCatchingExceptions(() -> bot.onGameStarted(new GameStarted(gameStartApiResponse)));
+        runBotMethodCatchingExceptions(() -> bot.onGameStarted(new GameStartedApiResponseImpl(gameStartApiResponse)));
         actions.sendChat(HELLO_MESSAGE);
         currentGameState = null;
     }
@@ -224,12 +223,12 @@ public class Games {
         }
 
         @Override
-        public void move(GameState.Field fieldFrom, GameState.Field fieldTo) {
+        public void move(Field fieldFrom, Field fieldTo) {
             move(fieldFrom.getIndex(), fieldTo.getIndex(), false);
         }
 
         @Override
-        public void move(GameState.Field fieldFrom, GameState.Field fieldTo, boolean moveHalf) {
+        public void move(Field fieldFrom, Field fieldTo, boolean moveHalf) {
             if (!fieldFrom.getNeighbours().contains(fieldTo)) {
                 LOGGER.error("Moving between fields that are not neighbours, it probably has no effect. {} ==> {}", fieldFrom, fieldTo);
             }
@@ -270,7 +269,7 @@ public class Games {
         }
 
         @Override
-        public void ping(GameState.Field field) {
+        public void ping(Field field) {
             ping(field.getIndex());
         }
 

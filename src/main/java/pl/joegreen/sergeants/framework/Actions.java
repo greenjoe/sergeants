@@ -1,7 +1,7 @@
 package pl.joegreen.sergeants.framework;
 
 import pl.joegreen.sergeants.api.GeneralsApi;
-import pl.joegreen.sergeants.framework.model.GameState;
+import pl.joegreen.sergeants.framework.model.Field;
 
 public interface Actions {
 
@@ -10,7 +10,7 @@ public interface Actions {
     /**
      * Direct move between fields. Works only if both fields are neighbours (either horizontally or vertically, not diagonally) - otherwise does nothing and logs error.
      */
-    void move(GameState.Field fieldFrom, GameState.Field fieldTo);
+    void move(Field fieldFrom, Field fieldTo);
 
     void move(int indexFrom, int indexTo, boolean moveHalf);
 
@@ -18,7 +18,7 @@ public interface Actions {
      * Direct move between fields. Works only if both fields are neighbours (either horizontally or vertically, not diagonally) - otherwise does nothing and logs error.
      * @param moveHalf if true, only half of the army will be moved (equal to double click in browser)
      */
-    void move(GameState.Field fieldFrom, GameState.Field fieldTo, boolean moveHalf);
+    void move(Field fieldFrom, Field fieldTo, boolean moveHalf);
 
     void sendChat(String message);
 
@@ -28,7 +28,7 @@ public interface Actions {
 
     void ping(int index);
 
-    void ping(GameState.Field field);
+    void ping(Field field);
 
     /**
      * Remove all moves from the move queue.

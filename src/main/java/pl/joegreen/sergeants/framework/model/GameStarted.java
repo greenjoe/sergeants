@@ -1,25 +1,18 @@
 package pl.joegreen.sergeants.framework.model;
 
-import lombok.EqualsAndHashCode;
-import pl.joegreen.sergeants.api.response.GameStartApiResponse;
+import pl.joegreen.sergeants.framework.model.api.UpdatableGameState;
 
-@EqualsAndHashCode
-public class GameStarted {
-
-    private final GameStartApiResponse gameStartApiResponse;
-
-    public GameStarted(GameStartApiResponse gameStartApiResponse) {
-        this.gameStartApiResponse = gameStartApiResponse;
-    }
-
+public interface GameStarted {
     /**
-     * See {@link GameState#getReplayId()}
+     * See {@link UpdatableGameState#getReplayId()}
      */
-    public String getReplayId() {
-        return gameStartApiResponse.getReplayId();
-    }
+    String getReplayId();
 
-    public String[] getUsernames() {
-        return gameStartApiResponse.getUsernames();
-    }
+    String[] getUsernames();
+
+    int getPlayerIndex();
+
+    String getChatRoom();
+
+    String getTeamChatRoom();
 }

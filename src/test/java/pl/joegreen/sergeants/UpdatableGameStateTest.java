@@ -1,21 +1,18 @@
 package pl.joegreen.sergeants;
 
+import com.google.common.collect.ImmutableList;
+import org.hamcrest.Matchers;
+import org.junit.Test;
 import pl.joegreen.sergeants.api.response.GameStartApiResponse;
 import pl.joegreen.sergeants.api.response.GameUpdateApiResponse;
 import pl.joegreen.sergeants.api.response.ScoreApiResponse;
-import com.google.common.collect.ImmutableList;
-import pl.joegreen.sergeants.framework.model.GameState;
-import pl.joegreen.sergeants.framework.model.Player;
-import pl.joegreen.sergeants.framework.model.Position;
-import org.hamcrest.Matchers;
-import org.junit.Test;
+import pl.joegreen.sergeants.framework.model.*;
+import pl.joegreen.sergeants.framework.model.api.UpdatableGameState;
 
 import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-public class GameStateTest {
+public class UpdatableGameStateTest {
 
     @Test
     public void shouldCreateGameState() {
@@ -43,7 +40,7 @@ public class GameStateTest {
                 42, 0, 0
         }
         );
-        GameState gameState = GameState.createInitialGameState(gameStartApiResponse, gameUpdateApiResponse);
+        GameState gameState = UpdatableGameState.createInitialGameState(gameStartApiResponse, gameUpdateApiResponse);
         assertEquals(1, gameState.getMyPlayerIndex());
         assertEquals("chatRoom", gameState.getChatRoom());
         assertEquals("teamChatRoom", gameState.getTeamChatRoom());
@@ -54,7 +51,7 @@ public class GameStateTest {
                 new Player(2, "username3", 3, 0, 0, true)
 
         ), players);
-        GameState.VisibleField field00 = gameState.getFieldsMap().get(new Position(0 ,0)).asVisibleField();
+        VisibleField field00 = gameState.getFieldsMap().get(new Position(0 ,0)).asVisibleField();
         assertEquals(new Position(0, 0), field00.getPosition());
         assertEquals(4, field00.getArmy());
         assertTrue(field00.isCity());
@@ -63,7 +60,7 @@ public class GameStateTest {
         assertFalse(field00.isBlank());
         assertTrue(field00.isOwnedBy(1));
 
-        GameState.VisibleField field01 = gameState.getFieldsMap().get(new Position(0 ,1)).asVisibleField();
+        VisibleField field01 = gameState.getFieldsMap().get(new Position(0 ,1)).asVisibleField();
         assertEquals(new Position(0, 1), field01.getPosition());
         assertEquals(3, field01.getArmy());
         assertFalse(field01.isCity());
@@ -72,7 +69,7 @@ public class GameStateTest {
         assertFalse(field01.isBlank());
         assertTrue(field01.isOwnedBy(2));
 
-        GameState.VisibleField field10 = gameState.getFieldsMap().get(new Position(1 ,0)).asVisibleField();
+        VisibleField field10 = gameState.getFieldsMap().get(new Position(1 ,0)).asVisibleField();
         assertEquals(new Position(1, 0), field10.getPosition());
         assertEquals(0, field10.getArmy());
         assertFalse(field10.isCity());
@@ -81,7 +78,7 @@ public class GameStateTest {
         assertTrue(field10.isBlank());
         assertFalse(field10.hasOwner());
 
-        GameState.Field field11 = gameState.getFieldsMap().get(new Position(1 ,1));
+        Field field11 = gameState.getFieldsMap().get(new Position(1 ,1));
         assertEquals(new Position(1, 1), field11.getPosition());
         assertTrue(field11.isObstacle());
         assertFalse(field11.isVisible());

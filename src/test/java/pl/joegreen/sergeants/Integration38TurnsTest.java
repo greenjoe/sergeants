@@ -12,6 +12,7 @@ import pl.joegreen.sergeants.api.test.FakeSocket;
 import pl.joegreen.sergeants.framework.Bot;
 import pl.joegreen.sergeants.framework.Games;
 import pl.joegreen.sergeants.framework.model.*;
+import pl.joegreen.sergeants.framework.model.api.UpdatableGameState;
 import pl.joegreen.sergeants.framework.queue.QueueConfiguration;
 import pl.joegreen.sergeants.framework.user.UserConfiguration;
 
@@ -76,8 +77,8 @@ public class Integration38TurnsTest {
 
         Position blueGeneralPosition = new Position(10, 8);
         Position redGeneralPosition = new Position(17, 6);
-        GameState.VisibleField blueGeneralField = gameState.getVisibleFieldsMap().get(blueGeneralPosition);
-        GameState.VisibleField redGeneralField = gameState.getVisibleFieldsMap().get(redGeneralPosition);
+        VisibleField blueGeneralField = gameState.getVisibleFieldsMap().get(blueGeneralPosition);
+        VisibleField redGeneralField = gameState.getVisibleFieldsMap().get(redGeneralPosition);
 
         assertTrue(blueGeneralField.isGeneral() && blueGeneralField.isOwnedByMe() && blueGeneralField.isOwnedByMyTeam()
                 && !blueGeneralField.isCity() && !blueGeneralField.isObstacle() && blueGeneralField.getArmy() == 6);
@@ -91,10 +92,10 @@ public class Integration38TurnsTest {
     public void botShouldReceiveFieldsWithCities() {
         GameState gameState = getLastGameStateReceivedByBot();
 
-        assertEquals(4, gameState.getVisibleFields().stream().filter(GameState.VisibleField::isCity).count());
+        assertEquals(4, gameState.getVisibleFields().stream().filter(VisibleField::isCity).count());
 
         Position cityBelowBlueGeneralPosition = new Position(11, 8);
-        GameState.VisibleField cityBelowBlueGeneralField = gameState.getVisibleFieldsMap().get(cityBelowBlueGeneralPosition);
+        VisibleField cityBelowBlueGeneralField = gameState.getVisibleFieldsMap().get(cityBelowBlueGeneralPosition);
         assertTrue(cityBelowBlueGeneralField.isCity() && !cityBelowBlueGeneralField.isGeneral()
                 && !cityBelowBlueGeneralField.hasOwner() && !cityBelowBlueGeneralField.isOwnedByMyTeam() && !cityBelowBlueGeneralField.isObstacle()
                 && !cityBelowBlueGeneralField.isBlank() && cityBelowBlueGeneralField.getArmy() == 49);
@@ -125,31 +126,31 @@ public class Integration38TurnsTest {
     @Test
     public void botShouldReceiveCorrectInfoAboutItsFields(){
         GameState gameState = getLastGameStateReceivedByBot();
-        assertEquals(31, gameState.getVisibleFields().stream().filter(GameState.VisibleField::isOwnedByMe).count());
-        GameState.VisibleField fieldWithBiggestBotArmy = gameState.getVisibleFieldsMap().get(new Position(13, 8));
+        assertEquals(31, gameState.getVisibleFields().stream().filter(VisibleField::isOwnedByMe).count());
+        VisibleField fieldWithBiggestBotArmy = gameState.getVisibleFieldsMap().get(new Position(13, 8));
         assertEquals(12, fieldWithBiggestBotArmy.getArmy());
     }
 
     @Test
     public void botShouldReceiveCorrectInfoAboutTeamFields(){
         GameState gameState = getLastGameStateReceivedByBot();
-        assertEquals(40, gameState.getVisibleFields().stream().filter(GameState.VisibleField::isOwnedByMyTeam).count());
-        GameState.VisibleField fieldWithBiggestTeamMateArmy = gameState.getVisibleFieldsMap().get(new Position(14, 11));
+        assertEquals(40, gameState.getVisibleFields().stream().filter(VisibleField::isOwnedByMyTeam).count());
+        VisibleField fieldWithBiggestTeamMateArmy = gameState.getVisibleFieldsMap().get(new Position(14, 11));
         assertEquals(18, fieldWithBiggestTeamMateArmy.getArmy());
     }
 
     @Test
     public void botShouldReceiveCorrectInfoAboutEnemyFields(){
         GameState gameState = getLastGameStateReceivedByBot();
-        assertEquals(6, gameState.getVisibleFields().stream().filter(GameState.VisibleField::isOwnedByEnemy).count());
-        GameState.VisibleField fieldWithBiggestEnemyArmy = gameState.getVisibleFieldsMap().get(new Position(7, 7));
+        assertEquals(6, gameState.getVisibleFields().stream().filter(VisibleField::isOwnedByEnemy).count());
+        VisibleField fieldWithBiggestEnemyArmy = gameState.getVisibleFieldsMap().get(new Position(7, 7));
         assertEquals(5, fieldWithBiggestEnemyArmy.getArmy());
     }
 
 
 
     private GameState getLastGameStateReceivedByBot() {
-        ArgumentCaptor<GameState> gameStateCaptor = ArgumentCaptor.forClass(GameState.class);
+        ArgumentCaptor<UpdatableGameState> gameStateCaptor = ArgumentCaptor.forClass(UpdatableGameState.class);
         Mockito.verify(bot, Mockito.atLeastOnce()).onGameStateUpdate(gameStateCaptor.capture());
         return gameStateCaptor.getValue();
     }
