@@ -95,6 +95,7 @@ The following example shows how to set the username using the `GeneralsApi` clas
         GeneralsApi generalsApi = GeneralsApi.create().onSetUsernameError(System.out::println);
         generalsApi.onConnected(() ->
                 generalsApi.setUsername("userId", "userName"));
+        generalsApi.connect();
 ```
 
 # Versions & contributing
