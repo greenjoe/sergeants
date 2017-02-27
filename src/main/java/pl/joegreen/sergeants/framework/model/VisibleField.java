@@ -1,15 +1,13 @@
 package pl.joegreen.sergeants.framework.model;
 
-import lombok.ToString;
-
 import java.util.Optional;
 
-@ToString(callSuper = true)
+
 public class VisibleField extends Field {
-    private int army;
-    private boolean city;
-    private boolean general;
-    private Optional<Integer> ownerIndex;
+    private final int army;
+    private final boolean city;
+    private final boolean general;
+    private final Optional<Integer> ownerIndex;
 
 
     public VisibleField(GameStateFieldContext gameStateContext, Position position, FieldTerrainType terrainType, Optional<Integer> ownerIndex, int army, boolean city, boolean general) {
@@ -27,7 +25,7 @@ public class VisibleField extends Field {
 
     @Override
     public boolean isObstacle() {
-        return terrainType.equals(FieldTerrainType.MOUNTAIN);
+        return getTerrainType().equals(FieldTerrainType.MOUNTAIN);
     }
 
     @Override
@@ -83,4 +81,9 @@ public class VisibleField extends Field {
         return city;
     }
 
+
+    @Override
+    public String toString() {
+        return String.format("VisibleField[position=%s, terrain=%s, army=%s, owner=%s, city=%s, general=%s]", getPosition(), getTerrainType(), getArmy(), getOwnerIndex(), isCity(), isGeneral());
+    }
 }

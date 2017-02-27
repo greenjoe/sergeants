@@ -1,15 +1,12 @@
 package pl.joegreen.sergeants.framework.model;
 
-import lombok.ToString;
-
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@ToString(callSuper = true)
 public class Field {
-    protected GameStateFieldContext gameStateContext;
-    protected Position position;
-    protected FieldTerrainType terrainType;
+    protected final GameStateFieldContext gameStateContext;
+    private final Position position;
+    private final FieldTerrainType terrainType;
 
     public Field(GameStateFieldContext gameStateContext, Position position, FieldTerrainType terrainType) {
         this.gameStateContext = gameStateContext;
@@ -69,4 +66,12 @@ public class Field {
         return gameStateContext.positionToIndex(position);
     }
 
+    public FieldTerrainType getTerrainType() {
+        return terrainType;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Field[position=%s, terrain=%s]", getPosition(), terrainType);
+    }
 }
