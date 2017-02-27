@@ -27,6 +27,12 @@ public interface GameState extends GameStateFieldContext{
     int getTurn();
 
     /**
+     * Officially "the attackIndex field is unnecessary for bots -- it's used by our client to show/hide attack arrows when appropriate."
+     * Some people say it can be used to find out state of moves queue and plan more complex moves ;-)
+     */
+    int getAttackIndex();
+
+    /**
      * Players currently playing and those already dead. Represents the table that is displayed in browser in the
      * top right corner of the map.
      */

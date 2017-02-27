@@ -24,6 +24,8 @@ public class UpdatableGameState implements GameState {
     private final ImmutableList<Player> players;
     private final ImmutableMap<Position, Field> fields;
     private final int turn;
+    private final int attackIndex;
+
 
     /*Data persisted so that it's possible to update the game state */
     private final GameStartApiResponse startData;
@@ -42,8 +44,8 @@ public class UpdatableGameState implements GameState {
                 firstUpdateData.getTurn(), startData, MapPatcher.patch(firstUpdateData.getMapDiff(), new int[]{}),
                 MapPatcher.patch(firstUpdateData.getCitiesDiff(), new int[]{}),
                 firstUpdateData.getGenerals(),
-                createPlayersInfo(startData, firstUpdateData)
-        );
+                createPlayersInfo(startData, firstUpdateData),
+                firstUpdateData.getAttackIndex());
     }
 
 
@@ -56,8 +58,8 @@ public class UpdatableGameState implements GameState {
                 gameUpdateData.getTurn(), startData, MapPatcher.patch(gameUpdateData.getMapDiff(), rawMapArray),
                 MapPatcher.patch(gameUpdateData.getCitiesDiff(), rawCitiesArray),
                 gameUpdateData.getGenerals(),
-                createPlayersInfo(startData, gameUpdateData)
-        );
+                createPlayersInfo(startData, gameUpdateData),
+                gameUpdateData.getAttackIndex());
     }
 
 
@@ -75,6 +77,11 @@ public class UpdatableGameState implements GameState {
     @Override
     public int getTurn() {
         return turn;
+    }
+
+    @Override
+    public int getAttackIndex() {
+        return attackIndex;
     }
 
     @Override
@@ -113,13 +120,14 @@ public class UpdatableGameState implements GameState {
     }
 
 
-    private UpdatableGameState(int turn, GameStartApiResponse startData, int[] fields, int[] cities, int[] generals, ImmutableList<Player> players) {
+    private UpdatableGameState(int turn, GameStartApiResponse startData, int[] fields, int[] cities, int[] generals, ImmutableList<Player> players, int attackIndex) {
         this.turn = turn;
         this.rawCitiesArray = cities;
         this.rawMapArray = fields;
         this.rawGeneralsArray = generals;
         this.players = players;
         this.startData = startData;
+        this.attackIndex = attackIndex;
         this.columns = rawMapArray[0];
         this.rows = rawMapArray[1];
         this.fields = createFieldsMapFromApiArrays();

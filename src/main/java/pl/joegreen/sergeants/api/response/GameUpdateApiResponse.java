@@ -22,7 +22,8 @@ public class GameUpdateApiResponse {
      */
     private int[] generals;
     /**
-     * "the attackIndex field is unnecessary for bots -- it's used by our client to show/hide attack arrows when appropriate."
+     * Officially "the attackIndex field is unnecessary for bots -- it's used by our client to show/hide attack arrows when appropriate."
+     * Some people say it can be used to find out state of moves queue and plan more complex moves ;-)
      */
     private int attackIndex;
     /**
