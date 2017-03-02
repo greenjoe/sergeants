@@ -38,8 +38,8 @@ public class SimpleBorderExpandingBot implements Bot {
 
         maybeFieldToAttack.ifPresent(fieldToAttack -> {
             VisibleField attackFrom = fieldToAttack.getVisibleNeighbours().stream()
-                    .filter(GameState.VisibleField::isOwnedByMe)
-                    .sorted(Comparator.comparing(GameState.VisibleField::getArmy).reversed())
+                    .filter(VisibleField::isOwnedByMe)
+                    .sorted(Comparator.comparing(VisibleField::getArmy).reversed())
                     .findFirst().get();
 
             actions.move(attackFrom, fieldToAttack);
