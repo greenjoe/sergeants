@@ -14,7 +14,7 @@ Add maven dependency
        <dependency>
             <groupId>pl.joegreen</groupId>
             <artifactId>sergeants</artifactId>
-            <version>0.3</version>
+            <version>0.4</version>
         </dependency>
 ```
 
@@ -32,12 +32,12 @@ public class SimpleBorderExpandingBot implements Bot {
 
     @Override
     public void onGameStateUpdate(GameState newGameState) {
-        Optional<GameState.VisibleField> maybeFieldToAttack = newGameState.getVisibleFields().stream()
+        Optional<VisibleField> maybeFieldToAttack = newGameState.getVisibleFields().stream()
                 .filter(this::canBeAttacked)
                 .findFirst();
 
         maybeFieldToAttack.ifPresent(fieldToAttack -> {
-            GameState.VisibleField attackFrom = fieldToAttack.getVisibleNeighbours().stream()
+            VisibleField attackFrom = fieldToAttack.getVisibleNeighbours().stream()
                     .filter(GameState.VisibleField::isOwnedByMe)
                     .sorted(Comparator.comparing(GameState.VisibleField::getArmy).reversed())
                     .findFirst().get();
@@ -48,7 +48,7 @@ public class SimpleBorderExpandingBot implements Bot {
 
     }
 
-    private boolean canBeAttacked(GameState.VisibleField potentialTarget) {
+    private boolean canBeAttacked(VisibleField potentialTarget) {
         return !potentialTarget.isObstacle() && !potentialTarget.isOwnedByMyTeam() &&
                 potentialTarget.getVisibleNeighbours().stream().anyMatch(
                         neighbour -> neighbour.isOwnedByMe() &&
