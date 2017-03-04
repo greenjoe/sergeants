@@ -4,10 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import pl.joegreen.sergeants.framework.Actions;
 import pl.joegreen.sergeants.framework.Bot;
-import pl.joegreen.sergeants.framework.model.Field;
-import pl.joegreen.sergeants.framework.model.GameResult;
-import pl.joegreen.sergeants.framework.model.GameStarted;
-import pl.joegreen.sergeants.framework.model.GameState;
+import pl.joegreen.sergeants.framework.model.*;
 
 import java.util.Optional;
 
@@ -32,11 +29,6 @@ public class SimulatorTest {
         Simulator server = SimulatorFactory.of(gameMap, 100, DoNothingBot::new, AttackGeneralBot::new);
         Optional<Player> winner = server.start();
         Assert.assertTrue(winner.isPresent());
-        AttackGeneralBot bot = (AttackGeneralBot) winner.get().getBot();
-        Assert.assertEquals(0, bot.enemyArmySize);//type is visible but army size is not, yes it should be fixed
-
-        Assert.assertEquals(2, bot.gameStarted.getUsernames().length);
-        Assert.assertEquals(GameResult.Result.WON, bot.gameResult.getResult());
 
         Assert.assertEquals(City.class, tiles[0].getClass());
         Assert.assertEquals(24, tiles[0].getArmySize());
@@ -71,8 +63,6 @@ public class SimulatorTest {
     private class AttackGeneralBot implements Bot {
         private final Actions actions;
         private GameStarted gameStarted;
-        private GameResult gameResult;
-        private int enemyArmySize;
 
 
         AttackGeneralBot(Actions actions) {
@@ -81,14 +71,31 @@ public class SimulatorTest {
 
         @Override
         public void onGameStarted(GameStarted gameStarted) {
-            this.gameStarted = gameStarted;
+            Assert.assertEquals(2, gameStarted.getUsernames().length);
         }
 
         @Override
         public void onGameStateUpdate(GameState newGameState) {
-            if (newGameState.getTurn() == 3) {
-                enemyArmySize = newGameState.getTwoDimensionalArrayOfFields()[0][0].asVisibleField().getArmy();
+            if (newGameState.getTurn() == 0) {
+                Field enemyGeneral = newGameState.getTwoDimensionalArrayOfFields()[0][0];
+                Field foggedCity = newGameState.getTwoDimensionalArrayOfFields()[0][1];
+                Field foggedMountain = newGameState.getTwoDimensionalArrayOfFields()[0][2];
+                Assert.assertEquals(FieldTerrainType.FOG, enemyGeneral.getTerrainType());
+                Assert.assertEquals(FieldTerrainType.FOG_OBSTACLE, foggedCity.getTerrainType());
+                Assert.assertEquals(FieldTerrainType.FOG_OBSTACLE, foggedMountain.getTerrainType());
+
+                int[] visibleIndexes = newGameState.getVisibleFields().stream().mapToInt(Field::getIndex).sorted().toArray();
+                Assert.assertArrayEquals(new int[]{4, 5, 7, 8}, visibleIndexes);
             }
+            if (newGameState.getTurn() == 24) {
+                VisibleField enemyGeneral = newGameState.getTwoDimensionalArrayOfFields()[0][0].asVisibleField();
+                VisibleField city = newGameState.getTwoDimensionalArrayOfFields()[0][1].asVisibleField();
+                VisibleField mountain = newGameState.getTwoDimensionalArrayOfFields()[0][2].asVisibleField();
+                Assert.assertTrue(enemyGeneral.isGeneral());
+                Assert.assertTrue(city.isCity());
+                Assert.assertEquals(FieldTerrainType.MOUNTAIN, mountain.getTerrainType());
+            }
+
             Field field = newGameState.getTwoDimensionalArrayOfFields()[2][2];
             if (field.asVisibleField().getArmy() == 12) {
                 actions.move(8, 7);
@@ -100,7 +107,7 @@ public class SimulatorTest {
 
         @Override
         public void onGameFinished(GameResult gameResult) {
-            this.gameResult = gameResult;
+            Assert.assertEquals(GameResult.Result.WON, gameResult.getResult());
         }
     }
 }

@@ -11,13 +11,11 @@ interface Tile {
 
 
     default int getArmySize() {
-//        throw new IllegalStateException("Can not get army size from: " + this.getClass().getSimpleName());
         return 0;
     }
 
     default int getPlayerIndex() {
         return -1;
-//        throw new IllegalStateException("Can not get player index from: " + this.getClass().getSimpleName());
     }
 
     default void turn() {
@@ -28,9 +26,7 @@ interface Tile {
 
     int getTileIndex();
 
-    default int getTerrain() {
-        return TILE_EMPTY;
-    }
+    int getTerrain(boolean visible);
 
     default int moveFrom(boolean half) {
         throw new IllegalStateException("Can not move from: " + this.getClass().getSimpleName());

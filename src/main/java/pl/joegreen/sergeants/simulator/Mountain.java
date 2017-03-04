@@ -7,7 +7,7 @@ class Mountain extends AbstractTile {
     }
 
     @Override
-    public int getTerrain() {
-        return TILE_MOUNTAIN;
+    public int getTerrain(boolean visible) {
+        return visible ? TILE_MOUNTAIN : TILE_FOG_OBSTACLE;
     }
 }

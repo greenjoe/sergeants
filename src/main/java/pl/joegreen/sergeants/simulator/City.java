@@ -24,4 +24,9 @@ class City extends Empty {
     public void round() {
         //do nothing
     }
+
+    @Override
+    public int getTerrain(boolean visible) {
+        return visible ? playerIndex : TILE_FOG_OBSTACLE;
+    }
 }

@@ -28,8 +28,8 @@ class Empty extends AbstractTile {
     }
 
     @Override
-    public int getTerrain() {
-        return playerIndex;
+    public int getTerrain(boolean visible) {
+        return visible ? playerIndex : TILE_FOG;
     }
 
     @Override

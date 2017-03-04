@@ -112,8 +112,8 @@ class GameMap {
 
     public GameUpdateApiResponse getUpdate(int playerIndex) {
         int[] mapDiff = getMapDiff(playerIndex);
-        int[] citiesDiff = getCitiesDiff(playerIndex);
-        int[] generals = getGenerals(playerIndex);
+        int[] citiesDiff = getCitiesDiff();
+        int[] generals = getGenerals();
         ScoreApiResponse[] scores = new ScoreApiResponse[0];
         double[] stars = new double[0];
         return new GameUpdateApiResponse(halfTurnCounter, mapDiff, citiesDiff, generals, 0, scores, stars);
@@ -121,38 +121,49 @@ class GameMap {
 
     private int[] getMapDiff(int playerIndex) {
         List<Integer> mapDiff = new ArrayList<>();
-        //invalidate whole mapdiff and send a complete update because no need to save bandwidth
-        mapDiff.add(0);
-        mapDiff.add(tiles.length * 2 + 2);
+        //invalidate whole map diff and send a complete update because no need to save bandwidth
+        mapDiff.add(0);//this means client has zero correct values
+        mapDiff.add(tiles.length * 2 + 2); //this is number of corrected values
         mapDiff.add(width);
         mapDiff.add(height);
 
+        //army size
         for (Tile tile : tiles) {
             int armySize = isVisible(playerIndex, tile) ? tile.getArmySize() : 0;
             mapDiff.add(armySize);
         }
 
-        //todo add fog
+        //terrain
         for (Tile tile : tiles) {
-            mapDiff.add(tile.getTerrain());
+            boolean visible = isVisible(playerIndex, tile);
+            int terrain = tile.getTerrain(visible);
+            mapDiff.add(terrain);
         }
         return mapDiff.stream().mapToInt(Integer::intValue).toArray();
     }
 
-    private int[] getCitiesDiff(int playerIndex) {
-        //todo add fog
+    /**
+     * Returns all cities, visible and fogged. This is not a problem since bot will still receive tile as fogged obstacle (-4).
+     *
+     * @return list of tileIndex where a city is located
+     */
+    private int[] getCitiesDiff() {
         List<Integer> allCities = Arrays.stream(tiles)
                 .filter(tile -> tile.getClass() == City.class)
                 .map(Tile::getTileIndex)
                 .collect(Collectors.toList());
 
-        allCities.add(0, allCities.size());
-        allCities.add(0, 0);
+        allCities.add(0, allCities.size()); //second element = wrong
+        allCities.add(0, 0);//first element = zero correct
         return allCities.stream().mapToInt(i -> i).toArray();
     }
 
-    private int[] getGenerals(int playerIndex) {
-        //todo add fog
+    /**
+     * Returns all generals, visible and fogged. This is not a problem since bot will still receive tile as fogged (-3).
+     *
+     * @return list of tileIndex where general is, array index is player index
+     */
+    private int[] getGenerals() {
         return Arrays.stream(tiles)
                 .filter(tile1 -> tile1.getClass().equals(General.class))
                 .sorted((t1, t2) -> t1.getPlayerIndex() - t2.getPlayerIndex())

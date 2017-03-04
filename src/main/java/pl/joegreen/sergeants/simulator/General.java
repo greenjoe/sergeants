@@ -24,4 +24,8 @@ class General extends City {
         return Optional.empty();
     }
 
+    @Override
+    public int getTerrain(boolean visible) {
+        return visible ? playerIndex : TILE_FOG;
+    }
 }
