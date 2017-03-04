@@ -22,7 +22,9 @@ public class UpdatableGameState implements GameState {
     private final int columns;
     private final int rows;
     private final ImmutableList<Player> players;
-    private final ImmutableMap<Position, Field> fields;
+    private final ImmutableMap<Position, Field> fieldsMap;
+    /*caching visibleFieldsMap even though GameState calculates it by default as this map is very likely to be used intensively */
+    private final ImmutableMap<Position, VisibleField> visibleFieldsMap;
     private final int turn;
     private final int attackIndex;
 
@@ -86,12 +88,17 @@ public class UpdatableGameState implements GameState {
 
     @Override
     public ImmutableMap<Position, Field> getFieldsMap() {
-        return fields;
+        return fieldsMap;
+    }
+
+    @Override
+    public ImmutableMap<Position, VisibleField> getVisibleFieldsMap() {
+        return visibleFieldsMap;
     }
 
     @Override
     public ImmutableList<Player> getPlayers() {
-        return ImmutableList.copyOf(players);
+        return players;
     }
 
     @Override
@@ -130,7 +137,8 @@ public class UpdatableGameState implements GameState {
         this.attackIndex = attackIndex;
         this.columns = rawMapArray[0];
         this.rows = rawMapArray[1];
-        this.fields = createFieldsMapFromApiArrays();
+        this.fieldsMap = createFieldsMapFromApiArrays();
+        this.visibleFieldsMap = GameState.super.getVisibleFieldsMap();
     }
 
 
