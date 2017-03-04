@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public interface GameState extends GameStateFieldContext{
+public interface GameState extends GameStateFieldContext {
     /**
      * Horizontal size of the map. Does not change during the game.
      */
@@ -92,17 +92,16 @@ public interface GameState extends GameStateFieldContext{
     }
 
 
-
     /**
      * Index of bot's player.
      */
-    default int getMyPlayerIndex(){
+    default int getMyPlayerIndex() {
         return getGameStartedData().getPlayerIndex();
     }
 
     /**
-     *  Replay identifier. Replays are available only after game is finished.
-     *  Use http://bot.generals.io/replays/{replayId} to see the replay in your browser.
+     * Replay identifier. Replays are available only after game is finished.
+     * Use http://bot.generals.io/replays/{replayId} to see the replay in your browser.
      */
     default String getReplayId() {
         return getGameStartedData().getReplayId();
@@ -122,16 +121,22 @@ public interface GameState extends GameStateFieldContext{
         return getGameStartedData().getTeamChatRoom();
     }
 
-    default Set<Field> getNeighbours(Field field) {
-        Position position = field.getPosition();
+    default Set<Position> getNeighbourPositions(Position position) {
         return Stream.of(
                 position.withCol(position.getCol() + 1),
                 position.withCol(position.getCol() - 1),
                 position.withRow(position.getRow() + 1),
                 position.withRow(position.getRow() - 1)
-        ).filter(this::isValidPosition)
-                .map(getFieldsMap()::get).collect(Collectors.toSet());
+        ).filter(this::isValidPosition).collect(Collectors.toSet());
     }
+
+    default Set<Field> getNeighbours(Field field) {
+        return getNeighbourPositions(field.getPosition())
+                .stream()
+                .map(this.getFieldsMap()::get)
+                .collect(Collectors.toSet());
+    }
+
 
 
 }
