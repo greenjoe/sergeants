@@ -10,14 +10,15 @@ class GeneralTile extends AbstractTile {
         super(tileIndex, INITIAL_ARMY_SIZE, playerIndex);
     }
 
+
     @Override
     public Optional<PlayerKilled> moveTo(int attackerArmySize, int attackerPlayerIndex, Tile[] tiles) {
-        if (this.playerIndex == attackerPlayerIndex) {
+        if (isOwnedBy(attackerPlayerIndex)) {
             armySize += attackerArmySize;
         } else if (attackerArmySize > armySize) {
             int newArmySize = attackerArmySize - armySize;
-            tiles[tileIndex] = new CityTile(tileIndex, newArmySize, attackerPlayerIndex);
-            return Optional.of(new PlayerKilled(this.playerIndex, attackerPlayerIndex));
+            tiles[tileIndex] = new CityTile(tileIndex, newArmySize, Optional.of(attackerPlayerIndex));
+            return Optional.of(new PlayerKilled(this.playerIndex.get(), attackerPlayerIndex));
         } else {
             armySize -= attackerArmySize;
         }
@@ -25,8 +26,8 @@ class GeneralTile extends AbstractTile {
     }
 
     @Override
-    public int getTerrain(boolean visible) {
-        return visible ? playerIndex : TILE_FOG;
+    public TerrainType getTerrainType(boolean visible) {
+        return visible ? TerrainType.playerOwnedTerrain(playerIndex.get()): TerrainType.TILE_FOG;
     }
 
     @Override

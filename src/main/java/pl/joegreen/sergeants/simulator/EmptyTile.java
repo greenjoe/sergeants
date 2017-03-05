@@ -1,20 +1,24 @@
 package pl.joegreen.sergeants.simulator;
 
+import java.util.Optional;
+
+import static pl.joegreen.sergeants.simulator.TerrainType.TILE_FOG;
+
 class EmptyTile extends AbstractTile {
 
-    public EmptyTile(int tileIndex) {
+    EmptyTile(int tileIndex) {
         super(tileIndex);
     }
 
     @Override
-    public int getTerrain(boolean visible) {
-        return visible ? playerIndex : TILE_FOG;
+    public TerrainType getTerrainType(boolean visible) {
+        return visible ? getOwnerPlayerIndex().map(TerrainType::playerOwnedTerrain).orElse(TerrainType.TILE_EMPTY) : TILE_FOG;
     }
 
 
     @Override
     public void round() {
-        if (playerIndex >= 0) {
+        if (hasOwner()) {
             armySize++;
         }
     }
@@ -22,6 +26,6 @@ class EmptyTile extends AbstractTile {
     @Override
     public void transfer(int playerIndex) {
         armySize /= 2;
-        this.playerIndex = playerIndex;
+        this.playerIndex = Optional.of(playerIndex);
     }
 }

@@ -52,7 +52,7 @@ public class GameMap {
             Tile fromTile = tiles[move.getFrom()];
             int armySize = fromTile.moveFrom(move.half());
             if (armySize > 0) {
-                return tiles[move.getTo()].moveTo(armySize, fromTile.getPlayerIndex(), tiles).map(this::transfer);
+                return tiles[move.getTo()].moveTo(armySize, fromTile.getOwnerPlayerIndex().orElse(-1), tiles).map(this::transfer);
             } else {
                 return move(moves);
             }
@@ -62,7 +62,7 @@ public class GameMap {
 
     private PlayerKilled transfer(PlayerKilled playerKilled) {
         Arrays.stream(tiles)
-                .filter(tile -> tile.getPlayerIndex() == playerKilled.getVictim())
+                .filter(tile -> tile.isOwnedBy(playerKilled.getVictim()))
                 .forEach(tile -> tile.transfer(playerKilled.getOffender()));
         return playerKilled;
     }
@@ -93,8 +93,8 @@ public class GameMap {
         //terrain
         for (Tile tile : tiles) {
             boolean visible = isVisible(playerIndex, tile);
-            int terrain = tile.getTerrain(visible);
-            mapDiff.add(terrain);
+            TerrainType terrain = tile.getTerrainType(visible);
+            mapDiff.add(terrain.intValue);
         }
         return mapDiff.stream().mapToInt(Integer::intValue).toArray();
     }
@@ -123,14 +123,13 @@ public class GameMap {
     int[] getGenerals() {
         return Arrays.stream(tiles)
                 .filter(tile1 -> tile1.getClass().equals(GeneralTile.class))
-                .sorted((t1, t2) -> t1.getPlayerIndex() - t2.getPlayerIndex())
+                .sorted((t1, t2) -> t1.getOwnerPlayerIndex().get() - t2.getOwnerPlayerIndex().get())
                 .mapToInt(Tile::getTileIndex)
                 .toArray();
     }
 
     private boolean isVisible(int playerIndex, Tile tile) {
-        boolean selfTile = tile.getPlayerIndex() == playerIndex;
-        return selfTile || getSurroundingTiles(tile).stream().anyMatch(t -> t.getPlayerIndex() == playerIndex);
+        return tile.isOwnedBy(playerIndex) || getSurroundingTiles(tile).stream().anyMatch(t -> t.isOwnedBy(playerIndex));
     }
 
     private List<Tile> getSurroundingTiles(Tile tile) {

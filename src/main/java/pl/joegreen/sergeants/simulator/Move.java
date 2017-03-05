@@ -7,7 +7,7 @@ class Move {
     private final boolean half;
 
 
-    public Move(int from, int to, boolean half) {
+    Move(int from, int to, boolean half) {
         this.from = from;
         this.to = to;
         this.half = half;
