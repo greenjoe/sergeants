@@ -20,13 +20,15 @@ import java.util.Optional;
 public class Simulator {
 
     private final Logger LOGGER = LoggerFactory.getLogger(Simulator.class);
-    private final int maxTurns;
-    private final Player players[];
     private final GameMap gameMap;
+    private final Player players[];
+    private int maxTurns = 10000;
 
-    Simulator(GameMap gameMap, int maxTurns, Player[] players) {
+    Simulator(GameMap gameMap, Player[] players) {
+        if (gameMap.getGenerals().length != players.length) {
+            throw new IllegalArgumentException("Game map generals and players has different length");
+        }
         this.gameMap = gameMap;
-        this.maxTurns = maxTurns;
         this.players = players;
     }
 
@@ -111,4 +113,11 @@ public class Simulator {
         return Optional.of(winner);
     }
 
+    public int getMaxTurns() {
+        return maxTurns;
+    }
+
+    public void setMaxTurns(int maxTurns) {
+        this.maxTurns = maxTurns;
+    }
 }

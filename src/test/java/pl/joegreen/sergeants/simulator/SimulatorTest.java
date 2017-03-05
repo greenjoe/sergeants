@@ -13,20 +13,23 @@ public class SimulatorTest {
 
     @Test
     public void testCreateMap() throws Exception {
-        GameMap map = SimulatorFactory.createMap(getClass().getResource("/replay.json").getFile());
+        GameMap map = SimulatorFactory.createMapFromReplay(getClass().getResource("/gioreplay8.json").getFile());
         Assert.assertNotNull(map);
         for (Tile tile : map.getTiles()) {
             Assert.assertNotNull(tile);
         }
-        Assert.assertEquals(map.getTiles().length, 324);
-        // http://generals.io/replays/H_Zz-V5Ix
+        Assert.assertEquals(map.getTiles().length, 504);
     }
 
     @Test
     public void testFullGame() {
-        GameMap gameMap = SimulatorFactory.createTestMap();
-        Tile[] tiles = gameMap.getTiles();
-        Simulator server = SimulatorFactory.of(gameMap, 100, DoNothingBot::new, AttackGeneralBot::new);
+        Tile[] tiles = new Tile[]{
+                new General(0, 0), new City(1, 11), new Mountain(2),
+                new Empty(3), new Empty(4), new Empty(5),
+                new Empty(6), new Empty(7), new General(8, 1)
+        };
+        GameMap gameMap = new GameMap(tiles, 3, 3);
+        Simulator server = SimulatorFactory.of(gameMap, DoNothingBot::new, AttackGeneralBot::new);
         Optional<Player> winner = server.start();
         Assert.assertTrue(winner.isPresent());
 

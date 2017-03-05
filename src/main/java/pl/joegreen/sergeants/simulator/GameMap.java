@@ -13,9 +13,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-class GameMap {
+public class GameMap {
     private final Logger LOGGER = LoggerFactory.getLogger(GameMap.class);
 
     private ObjectMapper om = new ObjectMapper();
@@ -27,7 +26,7 @@ class GameMap {
     private List<String> history = new ArrayList<>();
 
 
-    public GameMap(Tile[] tiles, int height, int width) {
+    GameMap(Tile[] tiles, int height, int width) {
         if ((height * width) != tiles.length) {
             throw new IllegalArgumentException("Incorrect height and width");
         }
@@ -36,41 +35,15 @@ class GameMap {
         this.tiles = tiles;
     }
 
-    public GameMap(int height, int width) {
+    GameMap(int height, int width) {
         this(new Tile[height * width], height, width);
-    }
-
-    public static GameMap of(final Replay replay) {
-        GameMap ret = new GameMap(replay.getMapHeight(), replay.getMapWidth());
-
-        Arrays.stream(replay.getMountains()).forEach(tileId -> ret.tiles[tileId] = new Mountain(tileId));
-
-        IntStream.range(0, replay.getCities().length).forEach(i -> {
-            int tileIndex = replay.getCities()[i];
-            int armySize = replay.getCityArmies()[i];
-            ret.tiles[tileIndex] = new City(tileIndex, armySize);
-        });
-
-        IntStream.range(0, replay.getGenerals().length).forEach(playerIndex -> {
-            int tileIndex = replay.getGenerals()[playerIndex];
-            String username = replay.getUsernames()[playerIndex];
-            ret.tiles[tileIndex] = new General(tileIndex, playerIndex);
-        });
-
-        IntStream.range(0, ret.tiles.length).forEach(tileIndex -> {
-            if (ret.tiles[tileIndex] == null) {
-                ret.tiles[tileIndex] = new Empty(tileIndex);
-            }
-        });
-
-        return ret;
     }
 
     Tile[] getTiles() {
         return tiles;
     }
 
-    public void tick() {
+    void tick() {
         halfTurnCounter++;
 
         if ((halfTurnCounter % 2) == 0) {
@@ -89,7 +62,7 @@ class GameMap {
     /**
      * Polls move recursively until it finds a valid move.
      */
-    public Optional<PlayerKilled> move(Deque<Move> moves) {
+    Optional<PlayerKilled> move(Deque<Move> moves) {
         Move move = moves.poll();
         if (move != null) {
             Tile fromTile = tiles[move.getFrom()];
@@ -110,7 +83,7 @@ class GameMap {
         return playerKilled;
     }
 
-    public GameUpdateApiResponse getUpdate(int playerIndex) {
+    GameUpdateApiResponse getUpdate(int playerIndex) {
         int[] mapDiff = getMapDiff(playerIndex);
         int[] citiesDiff = getCitiesDiff();
         int[] generals = getGenerals();
@@ -163,7 +136,7 @@ class GameMap {
      *
      * @return list of tileIndex where general is, array index is player index
      */
-    private int[] getGenerals() {
+    int[] getGenerals() {
         return Arrays.stream(tiles)
                 .filter(tile1 -> tile1.getClass().equals(General.class))
                 .sorted((t1, t2) -> t1.getPlayerIndex() - t2.getPlayerIndex())
@@ -215,11 +188,11 @@ class GameMap {
         return isMostLeft ? Optional.empty() : Optional.of(tiles[tileIndex - 1]);
     }
 
-    public int getHalfTurnCounter() {
+    int getHalfTurnCounter() {
         return halfTurnCounter;
     }
 
-    public void saveGameAsJson() {
+    void saveGameAsJson() {
         //pls don't look at this code
         try {
             final File file = new File("replay-data.js");

@@ -8,8 +8,10 @@ import pl.joegreen.sergeants.framework.Bot;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 
 /**
  * Factory class for creating simulations
@@ -22,18 +24,8 @@ public class SimulatorFactory {
     }
 
     @SafeVarargs
-    static Simulator of(int maxTurns, Function<Actions, Bot>... botProviders) {
-        return new Simulator(createTestMap(), maxTurns, createPlayers(botProviders));
-    }
-
-    @SafeVarargs
-    static Simulator of(GameMap gameMap, int maxTurns, Function<Actions, Bot>... botProviders) {
-        return new Simulator(gameMap, maxTurns, createPlayers(botProviders));
-    }
-
-    @SafeVarargs
-    public static Simulator of(String jsonReplay, int maxTurns, Function<Actions, Bot>... botProviders) throws IOException {
-        return of(createMap(jsonReplay), maxTurns, botProviders);
+    public static Simulator of(GameMap gameMap, Function<Actions, Bot>... botProviders) {
+        return new Simulator(gameMap, createPlayers(botProviders));
     }
 
     private static Player[] createPlayers(Function<Actions, Bot>[] botProviders) {
@@ -47,22 +39,53 @@ public class SimulatorFactory {
         return ret;
     }
 
-    static GameMap createMap(String file) {
+
+    /**
+     * GIOReplay files can be downloaded from http://dev.generals.io/replays
+     *
+     * @param gioReplayFileLocation file location
+     * @return a game map
+     */
+    public static GameMap createMapFromReplay(String gioReplayFileLocation) {
         try {
-            Replay replay = OBJECT_MAPPER.readValue(new File(file), Replay.class);
-            return GameMap.of(replay);
+            Replay replay = OBJECT_MAPPER.readValue(new File(gioReplayFileLocation), Replay.class);
+            GameMap ret = new GameMap(replay.getMapHeight(), replay.getMapWidth());
+
+            Arrays.stream(replay.getMountains()).forEach(tileId -> ret.getTiles()[tileId] = new Mountain(tileId));
+
+            IntStream.range(0, replay.getCities().length).forEach(i -> {
+                int tileIndex = replay.getCities()[i];
+                int armySize = replay.getCityArmies()[i];
+                ret.getTiles()[tileIndex] = new City(tileIndex, armySize);
+            });
+
+            IntStream.range(0, replay.getGenerals().length).forEach(playerIndex -> {
+                int tileIndex = replay.getGenerals()[playerIndex];
+                ret.getTiles()[tileIndex] = new General(tileIndex, playerIndex);
+            });
+
+            IntStream.range(0, ret.getTiles().length).forEach(tileIndex -> {
+                if (ret.getTiles()[tileIndex] == null) {
+                    ret.getTiles()[tileIndex] = new Empty(tileIndex);
+                }
+            });
+
+            return ret;
         } catch (IOException e) {
-            throw new RuntimeException("Can not create game map from file: " + file, e);
+            throw new RuntimeException("Can not create game map from file: " + gioReplayFileLocation, e);
         }
     }
 
-    static GameMap createTestMap() {
-        Tile[] tiles = new Tile[]{
-                new General(0, 0), new City(1, 11), new Mountain(2),
-                new Empty(3), new Empty(4), new Empty(5),
-                new Empty(6), new Empty(7), new General(8, 1)
-        };
-        return new GameMap(tiles, 3, 3);
+    public static GameMap create2PlayerMap() {
+        // http://generals.io/replays/B5A3EuoLe
+        String file = SimulatorFactory.class.getResource("/gioreplay2.json").getFile();
+        return createMapFromReplay(file);
+    }
+
+    public static GameMap create8PlayerMap() {
+        // http://generals.io/replays/B5_2c4gPe
+        String file = SimulatorFactory.class.getResource("/gioreplay8.json").getFile();
+        return createMapFromReplay(file);
     }
 
 
