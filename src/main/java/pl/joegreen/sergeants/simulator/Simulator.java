@@ -8,7 +8,9 @@ import pl.joegreen.sergeants.framework.model.GameResult;
 import pl.joegreen.sergeants.framework.model.api.GameStartedApiResponseImpl;
 import pl.joegreen.sergeants.framework.model.api.UpdatableGameState;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -22,6 +24,7 @@ public class Simulator {
     private final Logger LOGGER = LoggerFactory.getLogger(Simulator.class);
     private final GameMap gameMap;
     private final Player players[];
+    private final List<SimulatorListener> listeners = new ArrayList<>();
     private int maxTurns = 10000;
 
     Simulator(GameMap gameMap, Player[] players) {
@@ -39,6 +42,8 @@ public class Simulator {
      */
     public Optional<Player> start() {
         LOGGER.info("Starting match with: {}", Arrays.toString(players));
+        listeners.forEach(simulatorListener -> simulatorListener.beforeGameStart(players, gameMap));
+
         Arrays.stream(players).forEach(p -> {
             GameStartApiResponse startData = getStartData(p.getPlayerIndex());
             p.getBot().onGameStarted(new GameStartedApiResponseImpl(startData));
@@ -55,6 +60,8 @@ public class Simulator {
                     .map(Optional::get)
                     .forEach(this::endPlayer);
             gameMap.tick();
+            listeners.forEach(simulatorListener -> simulatorListener.afterHalfTurn(gameMap.getHalfTurnCounter(), gameMap.getTiles()));
+
 
             boolean reachedMaxTurns = gameMap.getHalfTurnCounter() > (maxTurns * 2);
             Player[] alive = Arrays.stream(this.players).filter(Player::isAlive).toArray(Player[]::new);
@@ -96,7 +103,7 @@ public class Simulator {
     }
 
     private Optional<Player> disconnectPlayers(Player[] players) {
-        gameMap.saveGameAsJson();
+        listeners.forEach(simulatorListener -> simulatorListener.onGameAborted(players));
         Arrays.stream(players).forEach(p -> {
             GameResult.Result result = GameResult.Result.DISCONNECTED;
             GameResult gameResult = new GameResult(result, p.getGameState(), Optional.empty());
@@ -106,7 +113,7 @@ public class Simulator {
     }
 
     private Optional<Player> endGame(Player winner) {
-        gameMap.saveGameAsJson();
+        listeners.forEach(simulatorListener -> simulatorListener.onGameEnd(winner));
         GameResult.Result result = GameResult.Result.WON;
         GameResult gameResult = new GameResult(result, winner.getGameState(), Optional.empty());
         winner.getBot().onGameFinished(gameResult);
@@ -119,5 +126,9 @@ public class Simulator {
 
     public void setMaxTurns(int maxTurns) {
         this.maxTurns = maxTurns;
+    }
+
+    public List<SimulatorListener> getListeners() {
+        return listeners;
     }
 }

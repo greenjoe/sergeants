@@ -30,6 +30,7 @@ public class SimulatorTest {
         };
         GameMap gameMap = new GameMap(tiles, 3, 3);
         Simulator server = SimulatorFactory.of(gameMap, DoNothingBot::new, AttackGeneralBot::new);
+        server.setMaxTurns(200);
         Optional<Player> winner = server.start();
         Assert.assertTrue(winner.isPresent());
 

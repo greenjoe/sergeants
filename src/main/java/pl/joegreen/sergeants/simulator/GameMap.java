@@ -1,29 +1,18 @@
 package pl.joegreen.sergeants.simulator;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import pl.joegreen.sergeants.api.response.GameUpdateApiResponse;
 import pl.joegreen.sergeants.api.response.ScoreApiResponse;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class GameMap {
-    private final Logger LOGGER = LoggerFactory.getLogger(GameMap.class);
-
-    private ObjectMapper om = new ObjectMapper();
 
     private final Tile[] tiles;
     private int halfTurnCounter = 0;
     private final int width;
     private final int height;
-    private List<String> history = new ArrayList<>();
 
 
     GameMap(Tile[] tiles, int height, int width) {
@@ -51,11 +40,6 @@ public class GameMap {
         }
         if ((halfTurnCounter % 25) == 0) {
             Arrays.stream(tiles).forEach(Tile::round);
-        }
-        try {
-            history.add(om.writeValueAsString(tiles));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Write json failed: " + halfTurnCounter, e);
         }
     }
 
@@ -192,22 +176,11 @@ public class GameMap {
         return halfTurnCounter;
     }
 
-    void saveGameAsJson() {
-        //pls don't look at this code
-        try {
-            final File file = new File("replay-data.js");
-            final PrintWriter printWriter = new PrintWriter(file);
-            printWriter.println("var generalIoReplay = {};");
-            printWriter.println("window.generalIoReplay = generalIoReplay;");
-            printWriter.println("generalIoReplay.width = " + width + ";");
-            printWriter.println("generalIoReplay.height = " + height + ";");
-            printWriter.println("generalIoReplay.history = [];");
-            history.forEach(s -> printWriter.println("generalIoReplay.history.push(JSON.parse('" + s + "'));"));
-            printWriter.flush();
-            printWriter.close();
-            LOGGER.info("******* A js file with replay has been created at: {}", file.getAbsoluteFile());
-        } catch (IOException e) {
-            LOGGER.error("Could not write json data history", e);
-        }
+    int getHeight() {
+        return height;
+    }
+
+    int getWidth() {
+        return width;
     }
 }
