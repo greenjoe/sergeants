@@ -1,15 +1,15 @@
 package pl.joegreen.sergeants.simulator;
 
-class City extends Empty {
+class CityTile extends AbstractTile {
 
     private final int initialArmySize;
 
-    public City(int tileIndex, int armySize, int playerIndex) {
+    CityTile(int tileIndex, int armySize, int playerIndex) {
         super(tileIndex, armySize, playerIndex);
         initialArmySize = armySize;
     }
 
-    public City(int tileIndex, int armySize) {
+    CityTile(int tileIndex, int armySize) {
         this(tileIndex, armySize, TILE_EMPTY);
     }
 
@@ -21,12 +21,13 @@ class City extends Empty {
     }
 
     @Override
-    public void round() {
-        //do nothing
+    public int getTerrain(boolean visible) {
+        return visible ? playerIndex : TILE_FOG_OBSTACLE;
     }
 
     @Override
-    public int getTerrain(boolean visible) {
-        return visible ? playerIndex : TILE_FOG_OBSTACLE;
+    public void transfer(int playerIndex) {
+        armySize /= 2;
+        this.playerIndex = playerIndex;
     }
 }

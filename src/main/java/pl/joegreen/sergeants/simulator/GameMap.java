@@ -106,7 +106,7 @@ public class GameMap {
      */
     private int[] getCitiesDiff() {
         List<Integer> allCities = Arrays.stream(tiles)
-                .filter(tile -> tile.getClass() == City.class)
+                .filter(tile -> tile.getClass() == CityTile.class)
                 .map(Tile::getTileIndex)
                 .collect(Collectors.toList());
 
@@ -122,7 +122,7 @@ public class GameMap {
      */
     int[] getGenerals() {
         return Arrays.stream(tiles)
-                .filter(tile1 -> tile1.getClass().equals(General.class))
+                .filter(tile1 -> tile1.getClass().equals(GeneralTile.class))
                 .sorted((t1, t2) -> t1.getPlayerIndex() - t2.getPlayerIndex())
                 .mapToInt(Tile::getTileIndex)
                 .toArray();

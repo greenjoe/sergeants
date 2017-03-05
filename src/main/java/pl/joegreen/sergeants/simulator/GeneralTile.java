@@ -2,21 +2,21 @@ package pl.joegreen.sergeants.simulator;
 
 import java.util.Optional;
 
-class General extends City {
+class GeneralTile extends AbstractTile {
 
+    private static final int INITIAL_ARMY_SIZE = 1;
 
-    General(int tileIndex, int playerIndex) {
-        super(tileIndex, 1, playerIndex);
+    GeneralTile(int tileIndex, int playerIndex) {
+        super(tileIndex, INITIAL_ARMY_SIZE, playerIndex);
     }
 
     @Override
     public Optional<PlayerKilled> moveTo(int attackerArmySize, int attackerPlayerIndex, Tile[] tiles) {
-        int oldPlayerIndex = this.getPlayerIndex();
         if (this.playerIndex == attackerPlayerIndex) {
             armySize += attackerArmySize;
         } else if (attackerArmySize > armySize) {
             int newArmySize = attackerArmySize - armySize;
-            tiles[tileIndex] = new City(tileIndex, newArmySize, attackerPlayerIndex);
+            tiles[tileIndex] = new CityTile(tileIndex, newArmySize, attackerPlayerIndex);
             return Optional.of(new PlayerKilled(this.playerIndex, attackerPlayerIndex));
         } else {
             armySize -= attackerArmySize;
@@ -28,4 +28,10 @@ class General extends City {
     public int getTerrain(boolean visible) {
         return visible ? playerIndex : TILE_FOG;
     }
+
+    @Override
+    public void turn() {
+        armySize++;
+    }
+
 }

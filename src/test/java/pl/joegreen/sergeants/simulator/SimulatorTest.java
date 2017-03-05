@@ -24,9 +24,9 @@ public class SimulatorTest {
     @Test
     public void testFullGame() {
         Tile[] tiles = new Tile[]{
-                new General(0, 0), new City(1, 11), new Mountain(2),
-                new Empty(3), new Empty(4), new Empty(5),
-                new Empty(6), new Empty(7), new General(8, 1)
+                new GeneralTile(0, 0), new CityTile(1, 11), new MountainTile(2),
+                new EmptyTile(3), new EmptyTile(4), new EmptyTile(5),
+                new EmptyTile(6), new EmptyTile(7), new GeneralTile(8, 1)
         };
         GameMap gameMap = new GameMap(tiles, 3, 3);
         Simulator server = SimulatorFactory.of(gameMap, DoNothingBot::new, AttackGeneralBot::new);
@@ -34,19 +34,19 @@ public class SimulatorTest {
         Optional<Player> winner = server.start();
         Assert.assertTrue(winner.isPresent());
 
-        Assert.assertEquals(City.class, tiles[0].getClass());
+        Assert.assertEquals(CityTile.class, tiles[0].getClass());
         Assert.assertEquals(24, tiles[0].getArmySize());
         Assert.assertEquals(1, tiles[0].getPlayerIndex());
 
-        Assert.assertEquals(City.class, tiles[1].getClass());
+        Assert.assertEquals(CityTile.class, tiles[1].getClass());
         Assert.assertEquals(2, tiles[1].getArmySize());
         Assert.assertEquals(1, tiles[1].getPlayerIndex());
 
-        Assert.assertEquals(Empty.class, tiles[3].getClass());
+        Assert.assertEquals(EmptyTile.class, tiles[3].getClass());
         Assert.assertEquals(17, tiles[3].getArmySize());
         Assert.assertEquals(1, tiles[3].getPlayerIndex());
 
-        Assert.assertEquals(General.class, tiles[8].getClass());
+        Assert.assertEquals(GeneralTile.class, tiles[8].getClass());
         Assert.assertEquals(3, tiles[8].getArmySize());
         Assert.assertEquals(1, tiles[8].getPlayerIndex());
     }

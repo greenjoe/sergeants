@@ -51,22 +51,22 @@ public class SimulatorFactory {
             Replay replay = OBJECT_MAPPER.readValue(new File(gioReplayFileLocation), Replay.class);
             GameMap ret = new GameMap(replay.getMapHeight(), replay.getMapWidth());
 
-            Arrays.stream(replay.getMountains()).forEach(tileId -> ret.getTiles()[tileId] = new Mountain(tileId));
+            Arrays.stream(replay.getMountains()).forEach(tileId -> ret.getTiles()[tileId] = new MountainTile(tileId));
 
             IntStream.range(0, replay.getCities().length).forEach(i -> {
                 int tileIndex = replay.getCities()[i];
                 int armySize = replay.getCityArmies()[i];
-                ret.getTiles()[tileIndex] = new City(tileIndex, armySize);
+                ret.getTiles()[tileIndex] = new CityTile(tileIndex, armySize);
             });
 
             IntStream.range(0, replay.getGenerals().length).forEach(playerIndex -> {
                 int tileIndex = replay.getGenerals()[playerIndex];
-                ret.getTiles()[tileIndex] = new General(tileIndex, playerIndex);
+                ret.getTiles()[tileIndex] = new GeneralTile(tileIndex, playerIndex);
             });
 
             IntStream.range(0, ret.getTiles().length).forEach(tileIndex -> {
                 if (ret.getTiles()[tileIndex] == null) {
-                    ret.getTiles()[tileIndex] = new Empty(tileIndex);
+                    ret.getTiles()[tileIndex] = new EmptyTile(tileIndex);
                 }
             });
 
