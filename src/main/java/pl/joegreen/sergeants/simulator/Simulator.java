@@ -38,9 +38,9 @@ public class Simulator {
     /**
      * Start simulation
      *
-     * @return the winner
+     * @return the winner player index
      */
-    public Optional<Player> start() {
+    public Optional<Integer> start() {
         LOGGER.info("Starting match with: {}", Arrays.toString(players));
         listeners.forEach(simulatorListener -> simulatorListener.beforeGameStart(players, gameMap));
 
@@ -102,7 +102,7 @@ public class Simulator {
         return new GameStartApiResponse(playerIndex, "replayId", "chatRoom", "teamChatRoom", participants, null);
     }
 
-    private Optional<Player> disconnectPlayers(Player[] players) {
+    private Optional<Integer> disconnectPlayers(Player[] players) {
         listeners.forEach(simulatorListener -> simulatorListener.onGameAborted(players));
         Arrays.stream(players).forEach(p -> {
             GameResult.Result result = GameResult.Result.DISCONNECTED;
@@ -112,12 +112,12 @@ public class Simulator {
         return Optional.empty();
     }
 
-    private Optional<Player> endGame(Player winner) {
+    private Optional<Integer> endGame(Player winner) {
         listeners.forEach(simulatorListener -> simulatorListener.onGameEnd(winner));
         GameResult.Result result = GameResult.Result.WON;
         GameResult gameResult = new GameResult(result, winner.getGameState(), Optional.empty());
         winner.getBot().onGameFinished(gameResult);
-        return Optional.of(winner);
+        return Optional.of(winner.getPlayerIndex());
     }
 
     public int getMaxTurns() {

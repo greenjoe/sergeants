@@ -1,6 +1,6 @@
 package pl.joegreen.sergeants.simulator;
 
-interface SimulatorListener {
+public interface SimulatorListener {
     void beforeGameStart(Player[] players, GameMap gameMap);
 
     void afterHalfTurn(int halfTurnCounter, Tile[] tiles);
