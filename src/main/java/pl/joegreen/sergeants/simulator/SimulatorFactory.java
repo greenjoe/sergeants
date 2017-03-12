@@ -24,9 +24,20 @@ public class SimulatorFactory {
         OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    @SafeVarargs
     public static Simulator of(GameMap gameMap, Function<Actions, Bot>... botProviders) {
-        return new Simulator(gameMap, createPlayers(botProviders));
+        return of(gameMap, Integer.MAX_VALUE, botProviders);
+    }
+
+    @SafeVarargs
+    public static Simulator of(GameMap gameMap, int maxTurns, Function<Actions, Bot>... botProviders) {
+        if (botProviders.length < 2) {
+            throw new IllegalArgumentException("Cannot simulate the game with less than 2 bots");
+        }
+        return new Simulator(gameMap, createPlayers(botProviders), maxTurns);
+    }
+
+    private SimulatorFactory() {
+        //only static methods in this class
     }
 
     private static Player[] createPlayers(Function<Actions, Bot>[] botProviders) {
@@ -57,28 +68,29 @@ public class SimulatorFactory {
     }
 
     private static GameMap createMapFromReplay(Replay replay) {
-        GameMap ret = new GameMap(replay.getMapHeight(), replay.getMapWidth());
 
-        Arrays.stream(replay.getMountains()).forEach(tileId -> ret.getTiles()[tileId] = new MountainTile(tileId));
+        Tile[] tiles = new Tile[replay.getMapHeight() * replay.getMapWidth()];
+
+        Arrays.stream(replay.getMountains()).forEach(tileId -> tiles[tileId] = new MountainTile(tileId));
 
         IntStream.range(0, replay.getCities().length).forEach(i -> {
             int tileIndex = replay.getCities()[i];
             int armySize = replay.getCityArmies()[i];
-            ret.getTiles()[tileIndex] = new CityTile(tileIndex, armySize);
+            tiles[tileIndex] = new CityTile(tileIndex, armySize);
         });
 
         IntStream.range(0, replay.getGenerals().length).forEach(playerIndex -> {
             int tileIndex = replay.getGenerals()[playerIndex];
-            ret.getTiles()[tileIndex] = new GeneralTile(tileIndex, playerIndex);
+            tiles[tileIndex] = new GeneralTile(tileIndex, playerIndex);
         });
 
-        IntStream.range(0, ret.getTiles().length).forEach(tileIndex -> {
-            if (ret.getTiles()[tileIndex] == null) {
-                ret.getTiles()[tileIndex] = new EmptyTile(tileIndex);
+        IntStream.range(0, tiles.length).forEach(tileIndex -> {
+            if (tiles[tileIndex] == null) {
+                tiles[tileIndex] = new EmptyTile(tileIndex);
             }
         });
+        return new GameMap(tiles, replay.getMapHeight(), replay.getMapWidth());
 
-        return ret;
     }
 
     public static GameMap create2PlayerMap() {

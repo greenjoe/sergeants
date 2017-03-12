@@ -25,14 +25,15 @@ public class Simulator {
     private final GameMap gameMap;
     private final Player players[];
     private final List<SimulatorListener> listeners = new ArrayList<>();
-    private int maxTurns = 10000;
+    private final int maxTurns;
 
-    Simulator(GameMap gameMap, Player[] players) {
+    Simulator(GameMap gameMap, Player[] players, int maxTurns) {
         if (gameMap.getGenerals().length != players.length) {
             throw new IllegalArgumentException("Game map generals and players has different length");
         }
         this.gameMap = gameMap;
         this.players = players;
+        this.maxTurns = maxTurns;
     }
 
     /**
@@ -122,10 +123,6 @@ public class Simulator {
 
     public int getMaxTurns() {
         return maxTurns;
-    }
-
-    public void setMaxTurns(int maxTurns) {
-        this.maxTurns = maxTurns;
     }
 
     public List<SimulatorListener> getListeners() {
