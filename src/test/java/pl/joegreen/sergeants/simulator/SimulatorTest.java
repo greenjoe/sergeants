@@ -13,7 +13,7 @@ public class SimulatorTest {
 
     @Test
     public void testCreateMap() throws Exception {
-        GameMap map = SimulatorFactory.createMapFromReplay(getClass().getResource("/gioreplay8.json").getFile());
+        GameMap map = SimulatorFactory.createMapFromReplayFile(getClass().getResource("/gioreplay8.json").getFile());
         Assert.assertNotNull(map);
         for (Tile tile : map.getTiles()) {
             Assert.assertNotNull(tile);
@@ -31,7 +31,7 @@ public class SimulatorTest {
         GameMap gameMap = new GameMap(tiles, 3, 3);
         Simulator server = SimulatorFactory.of(gameMap, DoNothingBot::new, AttackGeneralBot::new);
         server.setMaxTurns(200);
-        Optional<Player> winner = server.start();
+        Optional<Integer> winner = server.start();
         Assert.assertTrue(winner.isPresent());
 
         Assert.assertEquals(CityTile.class, tiles[0].getClass());

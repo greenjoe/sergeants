@@ -7,6 +7,7 @@ import pl.joegreen.sergeants.framework.Bot;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
@@ -46,46 +47,62 @@ public class SimulatorFactory {
      * @param gioReplayFileLocation file location
      * @return a game map
      */
-    public static GameMap createMapFromReplay(String gioReplayFileLocation) {
+    public static GameMap createMapFromReplayFile(String gioReplayFileLocation) {
         try {
             Replay replay = OBJECT_MAPPER.readValue(new File(gioReplayFileLocation), Replay.class);
-            GameMap ret = new GameMap(replay.getMapHeight(), replay.getMapWidth());
-
-            Arrays.stream(replay.getMountains()).forEach(tileId -> ret.getTiles()[tileId] = new MountainTile(tileId));
-
-            IntStream.range(0, replay.getCities().length).forEach(i -> {
-                int tileIndex = replay.getCities()[i];
-                int armySize = replay.getCityArmies()[i];
-                ret.getTiles()[tileIndex] = new CityTile(tileIndex, armySize);
-            });
-
-            IntStream.range(0, replay.getGenerals().length).forEach(playerIndex -> {
-                int tileIndex = replay.getGenerals()[playerIndex];
-                ret.getTiles()[tileIndex] = new GeneralTile(tileIndex, playerIndex);
-            });
-
-            IntStream.range(0, ret.getTiles().length).forEach(tileIndex -> {
-                if (ret.getTiles()[tileIndex] == null) {
-                    ret.getTiles()[tileIndex] = new EmptyTile(tileIndex);
-                }
-            });
-
-            return ret;
+            return createMapFromReplay(replay);
         } catch (IOException e) {
             throw new RuntimeException("Can not create game map from file: " + gioReplayFileLocation, e);
         }
     }
 
+    private static GameMap createMapFromReplay(Replay replay) {
+        GameMap ret = new GameMap(replay.getMapHeight(), replay.getMapWidth());
+
+        Arrays.stream(replay.getMountains()).forEach(tileId -> ret.getTiles()[tileId] = new MountainTile(tileId));
+
+        IntStream.range(0, replay.getCities().length).forEach(i -> {
+            int tileIndex = replay.getCities()[i];
+            int armySize = replay.getCityArmies()[i];
+            ret.getTiles()[tileIndex] = new CityTile(tileIndex, armySize);
+        });
+
+        IntStream.range(0, replay.getGenerals().length).forEach(playerIndex -> {
+            int tileIndex = replay.getGenerals()[playerIndex];
+            ret.getTiles()[tileIndex] = new GeneralTile(tileIndex, playerIndex);
+        });
+
+        IntStream.range(0, ret.getTiles().length).forEach(tileIndex -> {
+            if (ret.getTiles()[tileIndex] == null) {
+                ret.getTiles()[tileIndex] = new EmptyTile(tileIndex);
+            }
+        });
+
+        return ret;
+    }
+
     public static GameMap create2PlayerMap() {
         // http://generals.io/replays/B5A3EuoLe
-        String file = SimulatorFactory.class.getResource("/gioreplay2.json").getFile();
-        return createMapFromReplay(file);
+        try {
+            InputStream in = SimulatorFactory.class.getResourceAsStream("/gioreplay2.json");
+            Replay replay = OBJECT_MAPPER.readValue(in, Replay.class);
+            in.close();
+            return createMapFromReplay(replay);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Can not create replay");
+        }
     }
 
     public static GameMap create8PlayerMap() {
         // http://generals.io/replays/B5_2c4gPe
-        String file = SimulatorFactory.class.getResource("/gioreplay8.json").getFile();
-        return createMapFromReplay(file);
+        try {
+            InputStream in = SimulatorFactory.class.getResourceAsStream("/gioreplay8.json");
+            Replay replay = OBJECT_MAPPER.readValue(in, Replay.class);
+            in.close();
+            return createMapFromReplay(replay);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Can not create replay");
+        }
     }
 
 
