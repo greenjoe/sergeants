@@ -2,14 +2,18 @@ package pl.joegreen.sergeants.simulator;
 
 import java.util.Optional;
 
+import static pl.joegreen.sergeants.simulator.TerrainType.TILE_FOG_OBSTACLE;
+import static pl.joegreen.sergeants.simulator.TerrainType.TILE_MOUNTAIN;
+
+
 class MountainTile extends AbstractTile {
 
-    public MountainTile(int tileIndex) {
+    MountainTile(int tileIndex) {
         super(tileIndex);
     }
 
     @Override
-    public int getTerrain(boolean visible) {
+    public TerrainType getTerrainType(boolean visible) {
         return visible ? TILE_MOUNTAIN : TILE_FOG_OBSTACLE;
     }
 
@@ -19,8 +23,8 @@ class MountainTile extends AbstractTile {
     }
 
     @Override
-    public int getPlayerIndex() {
-        return TILE_EMPTY;
+    public Optional<Integer> getOwnerPlayerIndex() {
+        return Optional.empty();
     }
 
     @Override

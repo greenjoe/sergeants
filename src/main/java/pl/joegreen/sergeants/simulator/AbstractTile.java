@@ -2,21 +2,26 @@ package pl.joegreen.sergeants.simulator;
 
 import java.util.Optional;
 
+
 abstract class AbstractTile implements Tile {
 
     protected final int tileIndex;
     protected int armySize = 0;
-    protected int playerIndex = TILE_EMPTY;
-    ;
+    protected Optional<Integer> playerIndex = Optional.empty();
 
-    AbstractTile(int tileIndex, int armySize, int playerIndex) {
+
+    AbstractTile(int tileIndex, int armySize){
+        this(tileIndex, armySize, Optional.empty());
+    }
+    AbstractTile(int tileIndex, int armySize, int playerIndex){
+        this(tileIndex, armySize, Optional.of(playerIndex));
+    }
+
+
+    AbstractTile(int tileIndex, int armySize, Optional<Integer> playerIndex) {
         this.tileIndex = tileIndex;
         this.armySize = armySize;
         this.playerIndex = playerIndex;
-    }
-
-    AbstractTile(int tileIndex, int armySize) {
-        this(tileIndex, armySize, TILE_EMPTY);
     }
 
     AbstractTile(int tileIndex) {
@@ -34,7 +39,7 @@ abstract class AbstractTile implements Tile {
     }
 
     @Override
-    public int getPlayerIndex() {
+    public Optional<Integer> getOwnerPlayerIndex() {
         return playerIndex;
     }
 
@@ -47,11 +52,11 @@ abstract class AbstractTile implements Tile {
 
     @Override
     public Optional<PlayerKilled> moveTo(int attackerArmySize, int attackerPlayerIndex, Tile[] tiles) {
-        if (this.playerIndex == attackerPlayerIndex) {
+        if (isOwnedBy(attackerPlayerIndex)) {
             armySize += attackerArmySize;
         } else if (attackerArmySize > armySize) {
             armySize = attackerArmySize - armySize;
-            this.playerIndex = attackerPlayerIndex;
+            this.playerIndex = Optional.of(attackerPlayerIndex);
         } else {
             armySize -= attackerArmySize;
         }

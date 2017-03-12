@@ -4,10 +4,6 @@ import java.util.Optional;
 
 interface Tile {
 
-    int TILE_EMPTY = -1;
-    int TILE_MOUNTAIN = -2;
-    int TILE_FOG = -3;
-    int TILE_FOG_OBSTACLE = -4; // Cities and Mountains show up as Obstacles in the fog of war.
 
     /**
      * Used for the first half of mapdiff.
@@ -15,7 +11,15 @@ interface Tile {
      */
     int getArmySize();
 
-    int getPlayerIndex();
+    Optional<Integer> getOwnerPlayerIndex();
+
+    default boolean isOwnedBy(int playerIndex){
+        return getOwnerPlayerIndex().isPresent() && getOwnerPlayerIndex().get().equals(playerIndex);
+    }
+
+    default boolean hasOwner(){
+        return getOwnerPlayerIndex().isPresent();
+    }
 
     default void turn() {
     }
@@ -25,13 +29,7 @@ interface Tile {
 
     int getTileIndex();
 
-    /**
-     * Used for the second half of mapdiff.
-     * Any non negativ number indicate playerIndex.
-     * Any negative number indicate terrain type.
-     * Seriously? Yes!
-     */
-    int getTerrain(boolean visible);
+    TerrainType getTerrainType(boolean visible);
 
     int moveFrom(boolean half);
 

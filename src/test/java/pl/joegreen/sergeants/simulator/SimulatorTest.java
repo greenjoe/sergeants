@@ -36,19 +36,19 @@ public class SimulatorTest {
 
         Assert.assertEquals(CityTile.class, tiles[0].getClass());
         Assert.assertEquals(24, tiles[0].getArmySize());
-        Assert.assertEquals(1, tiles[0].getPlayerIndex());
+        Assert.assertEquals(Optional.of(1), tiles[0].getOwnerPlayerIndex());
 
         Assert.assertEquals(CityTile.class, tiles[1].getClass());
         Assert.assertEquals(2, tiles[1].getArmySize());
-        Assert.assertEquals(1, tiles[1].getPlayerIndex());
+        Assert.assertEquals(Optional.of(1), tiles[1].getOwnerPlayerIndex());
 
         Assert.assertEquals(EmptyTile.class, tiles[3].getClass());
         Assert.assertEquals(17, tiles[3].getArmySize());
-        Assert.assertEquals(1, tiles[3].getPlayerIndex());
+        Assert.assertEquals(Optional.of(1), tiles[3].getOwnerPlayerIndex());
 
         Assert.assertEquals(GeneralTile.class, tiles[8].getClass());
         Assert.assertEquals(3, tiles[8].getArmySize());
-        Assert.assertEquals(1, tiles[8].getPlayerIndex());
+        Assert.assertEquals(Optional.of(1), tiles[8].getOwnerPlayerIndex());
     }
 
     private class DoNothingBot implements Bot {

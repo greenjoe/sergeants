@@ -12,7 +12,7 @@ class SimulatorActions implements Actions {
     private final Logger LOGGER = LoggerFactory.getLogger(SimulatorActions.class);
     private final Deque<Move> moves;
 
-    public SimulatorActions(Deque<Move> moves) {
+    SimulatorActions(Deque<Move> moves) {
         this.moves = moves;
     }
 
