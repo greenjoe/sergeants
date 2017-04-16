@@ -24,10 +24,6 @@ public class GameMap {
         this.tiles = tiles;
     }
 
-    GameMap(int height, int width) {
-        this(new Tile[height * width], height, width);
-    }
-
     Tile[] getTiles() {
         return tiles;
     }
@@ -123,7 +119,7 @@ public class GameMap {
     int[] getGenerals() {
         return Arrays.stream(tiles)
                 .filter(tile1 -> tile1.getClass().equals(GeneralTile.class))
-                .sorted((t1, t2) -> t1.getOwnerPlayerIndex().get() - t2.getOwnerPlayerIndex().get())
+                .sorted(Comparator.comparingInt(t -> t.getOwnerPlayerIndex().get()))
                 .mapToInt(Tile::getTileIndex)
                 .toArray();
     }

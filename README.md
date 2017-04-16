@@ -107,4 +107,4 @@ will be needed and the backward interface compatibility with bots written for pr
 Well-described issues and pull requests are welcome. Please stick to the formatting conventions,
 which are basically Intellij Idea defaults. Lombok plugin may be needed to compile the project in an IDE.
 
-
+[![Build Status](https://travis-ci.org/greenjoe/sergeants.svg?branch=master)](https://travis-ci.org/greenjoe/sergeants)
