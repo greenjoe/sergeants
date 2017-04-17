@@ -10,10 +10,11 @@ abstract class AbstractTile implements Tile {
     protected Optional<Integer> playerIndex = Optional.empty();
 
 
-    AbstractTile(int tileIndex, int armySize){
+    AbstractTile(int tileIndex, int armySize) {
         this(tileIndex, armySize, Optional.empty());
     }
-    AbstractTile(int tileIndex, int armySize, int playerIndex){
+
+    AbstractTile(int tileIndex, int armySize, int playerIndex) {
         this(tileIndex, armySize, Optional.of(playerIndex));
     }
 
@@ -45,9 +46,13 @@ abstract class AbstractTile implements Tile {
 
     @Override
     public int moveFrom(boolean half) {
+        if (!playerIndex.isPresent()) {
+            throw new IllegalStateException("Cant move from here since there is no player owing it. Index:" + tileIndex);
+        }
         int moveSize = armySize - (half ? armySize / 2 : 1);
         armySize -= moveSize;
         return moveSize;
+
     }
 
     @Override
