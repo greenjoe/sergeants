@@ -7,11 +7,8 @@ import static pl.joegreen.sergeants.simulator.TerrainType.TILE_FOG_OBSTACLE;
 
 class CityTile extends AbstractTile {
 
-    private final int initialArmySize;
-
     CityTile(int tileIndex, int armySize, Optional<Integer> playerIndex) {
         super(tileIndex, armySize, playerIndex);
-        initialArmySize = armySize;
     }
 
     CityTile(int tileIndex, int armySize) {
@@ -20,8 +17,7 @@ class CityTile extends AbstractTile {
 
     @Override
     public void turn() {
-        //TOOD: city armies should grow to some extent also if they don't have owners
-        if (hasOwner() || getArmySize() < initialArmySize) {
+        if (hasOwner()) {
             armySize++;
         }
     }

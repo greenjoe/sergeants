@@ -59,7 +59,7 @@ public class SimulatorFullGameTest {
 
     private void checkFinalGameState(Tile[] tiles) {
         assertEquals(CityTile.class, tiles[0].getClass());
-        assertEquals(24, tiles[0].getArmySize());
+        assertEquals(10, tiles[0].getArmySize());
         assertEquals(Optional.of(1), tiles[0].getOwnerPlayerIndex());
 
         assertEquals(CityTile.class, tiles[1].getClass());
@@ -67,7 +67,7 @@ public class SimulatorFullGameTest {
         assertEquals(Optional.of(1), tiles[1].getOwnerPlayerIndex());
 
         assertEquals(EmptyTile.class, tiles[3].getClass());
-        assertEquals(17, tiles[3].getArmySize());
+        assertEquals(12, tiles[3].getArmySize());
         assertEquals(Optional.of(1), tiles[3].getOwnerPlayerIndex());
 
         assertEquals(GeneralTile.class, tiles[8].getClass());
