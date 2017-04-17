@@ -37,7 +37,6 @@ class Player {
 
     public void setInitialGameState(UpdatableGameState gameState) {
         this.gameState = gameState;
-        bot.onGameStateUpdate(gameState);
     }
 
     public void updateGameState(GameUpdateApiResponse gameUpdateApiResponses) {
