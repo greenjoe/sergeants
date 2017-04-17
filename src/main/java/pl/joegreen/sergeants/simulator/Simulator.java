@@ -55,7 +55,6 @@ public class Simulator {
         for (; ; ) {
             Arrays.stream(players)
                     .map(this::sendGameUpdate)
-                    .map(Player::getMoves)
                     .map(gameMap::move)
                     .filter(Optional::isPresent)
                     .map(Optional::get)

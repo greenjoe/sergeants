@@ -13,11 +13,11 @@ interface Tile {
 
     Optional<Integer> getOwnerPlayerIndex();
 
-    default boolean isOwnedBy(int playerIndex){
-        return getOwnerPlayerIndex().isPresent() && getOwnerPlayerIndex().get().equals(playerIndex);
+    default boolean isOwnedBy(int playerIndex) {
+        return getOwnerPlayerIndex().map(index -> index == playerIndex).orElse(false);
     }
 
-    default boolean hasOwner(){
+    default boolean hasOwner() {
         return getOwnerPlayerIndex().isPresent();
     }
 
@@ -37,9 +37,5 @@ interface Tile {
 
     default void transfer(int playerIndex) {
         throw new IllegalStateException("Can not transfer over: " + this.getClass().getSimpleName());
-    }
-
-    default String getType() {
-        return this.getClass().getSimpleName().toLowerCase();
     }
 }

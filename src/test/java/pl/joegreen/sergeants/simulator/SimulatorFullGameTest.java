@@ -91,6 +91,7 @@ public class SimulatorFullGameTest {
         @Override
         public void onGameStateUpdate(GameState newGameState) {
             super.onGameStateUpdate(newGameState);
+            actions.move(3, 4);//not a valid move, should be ignored by simulator
             Field field = newGameState.getTwoDimensionalArrayOfFields()[2][2];
             if (field.asVisibleField().getArmy() == 12) {
                 actions.move(8, 7);

@@ -42,15 +42,19 @@ public class GameMap {
     /**
      * Polls move recursively until it finds a valid move.
      */
-    Optional<PlayerKilled> move(Deque<Move> moves) {
-        Move move = moves.poll();
+    Optional<PlayerKilled> move(Player player) {
+        Move move = player.getMoves().poll();
         if (move != null) {
-            Tile fromTile = tiles[move.getFrom()];
-            int armySize = fromTile.moveFrom(move.half());
-            if (armySize > 0) {
-                return tiles[move.getTo()].moveTo(armySize, fromTile.getOwnerPlayerIndex().orElse(-1), tiles).map(this::transfer);
+            Tile from = tiles[move.getFrom()];
+            boolean armyBigEnough = from.getArmySize() > 1;
+            boolean tileAndPlayerMatching = from.isOwnedBy(player.getPlayerIndex());
+            if (armyBigEnough && tileAndPlayerMatching) {
+                int armySize = from.moveFrom(move.half());
+                return tiles[move.getTo()]
+                        .moveTo(armySize, from.getOwnerPlayerIndex().get(), tiles)
+                        .map(this::transfer);
             } else {
-                return move(moves);
+                return move(player);
             }
         }
         return Optional.empty();
