@@ -27,9 +27,8 @@ public class SimulatorFullGameTest {
 
         AttackGeneralBot attackGeneralBot = attackGeneralBotProvider.lastCreatedBot;
         GameState attackBotStateTurn0 = attackGeneralBot.receivedGameStates.get(0);
-        attackGeneralBot.receivedGameStates.stream().map(GameState::getTurn).forEach(System.out::println);
         checkAttackGameBotStateTurn0(attackBotStateTurn0);
-        GameState attackBotStateTurn24 = attackGeneralBot.receivedGameStates.get(25); //FIXME: bot gets two updates with turn 0, issue #10
+        GameState attackBotStateTurn24 = attackGeneralBot.receivedGameStates.get(24);
         checkAttackGameBotStateTurn24(attackBotStateTurn24);
         checkFinalGameState(tiles);
     }
@@ -85,6 +84,7 @@ public class SimulatorFullGameTest {
 
         @Override
         public void onGameStarted(GameStarted gameStarted) {
+            super.onGameStarted(gameStarted);
             assertEquals(2, gameStarted.getUsernames().length);
         }
 
@@ -103,6 +103,7 @@ public class SimulatorFullGameTest {
 
         @Override
         public void onGameFinished(GameResult gameResult) {
+            super.onGameFinished(gameResult);
             assertEquals(GameResult.Result.WON, gameResult.getResult());
         }
     }

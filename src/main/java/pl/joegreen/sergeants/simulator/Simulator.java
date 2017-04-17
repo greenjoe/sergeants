@@ -50,7 +50,7 @@ public class Simulator {
             p.getBot().onGameStarted(new GameStartedApiResponseImpl(startData));
         });
 
-        Arrays.stream(players).forEach(this::sendInitialGameUpdate);
+        Arrays.stream(players).forEach(this::setInitialGameUpdate);
 
         for (; ; ) {
             Arrays.stream(players)
@@ -79,7 +79,7 @@ public class Simulator {
         return player;
     }
 
-    private void sendInitialGameUpdate(Player player) {
+    private void setInitialGameUpdate(Player player) {
         int playerIndex = player.getPlayerIndex();
         GameStartApiResponse startData = getStartData(playerIndex);
         GameUpdateApiResponse gameUpdateApiResponses = gameMap.getUpdate(playerIndex);
