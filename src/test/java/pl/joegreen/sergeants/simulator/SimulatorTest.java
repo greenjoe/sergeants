@@ -5,6 +5,7 @@ import pl.joegreen.sergeants.framework.model.GameState;
 import pl.joegreen.sergeants.framework.model.VisibleField;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -24,8 +25,47 @@ public class SimulatorTest {
 
         assertEquals(4, lastGameStateReceivedByFirstBot.getVisibleFields().size());
         assertEquals(1, lastGameStateReceivedByFirstBot.getVisibleFields().stream().filter(VisibleField::isOwnedByMe).count());
-        assertEquals(2 * maxTurns, lastGameStateReceivedByFirstBot.getTurn());
+        assertEquals(turnToSecondHalfTick(maxTurns), lastGameStateReceivedByFirstBot.getTurn());
     }
 
+    @Test
+    public void test2x2CityTakeover() throws Exception {
+        GameMap gameMap = new GameMap(new Tile[]{
+                new GeneralTile(0, 0), new CityTile(1, 5), new EmptyTile(2), new GeneralTile(3, 1)
+        }, 2, 2);
+        BotInstanceCatcher<TestBot> conquerorBotProvider = new BotInstanceCatcher<>((actions) -> new TestBot() {
+            @Override
+            public void onGameStateUpdate(GameState newGameState) {
+                super.onGameStateUpdate(newGameState);
+                if (newGameState.getTurn() == turnToFistHalfTick(7)) {
+                    actions.move(0, 1);
+                }
+            }
+        });
+        int maxTurns = 7;
+        BotInstanceCatcher<DoNothingBot> doNothingBotProvider = new BotInstanceCatcher<>(DoNothingBot::new);
+
+        Simulator simulator = SimulatorFactory.of(gameMap, maxTurns, conquerorBotProvider, doNothingBotProvider);
+        simulator.start();
+        List<GameState> gameStatesReceivedByConqueror = conquerorBotProvider.lastCreatedBot.receivedGameStates;
+        GameState lastGameStateReceivedByByConqueror = gameStatesReceivedByConqueror.get(gameStatesReceivedByConqueror.size() - 1);
+
+        List<VisibleField> fieldsOwnedByConqueror = lastGameStateReceivedByByConqueror.getVisibleFields().stream().filter(VisibleField::isOwnedByMe).collect(Collectors.toList());
+        assertEquals(2, fieldsOwnedByConqueror.size());
+        int conquerorGeneralArmy = fieldsOwnedByConqueror.stream().filter(VisibleField::isGeneral).findFirst().get().getArmy();
+        assertEquals(2, conquerorGeneralArmy);
+        int cityArmy = fieldsOwnedByConqueror.stream().filter(VisibleField::isCity).findFirst().get().getArmy();
+        assertEquals(2, cityArmy);
+        assertEquals(turnToSecondHalfTick(maxTurns), lastGameStateReceivedByByConqueror.getTurn());
+    }
+
+
+    private static int turnToSecondHalfTick(int turn) {
+        return turn * 2;
+    }
+
+    private static int turnToFistHalfTick(int turn) {
+        return turn * 2 - 1;
+    }
 
 }
