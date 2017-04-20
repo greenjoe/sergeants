@@ -66,7 +66,9 @@ public class Simulator {
             boolean reachedMaxTurns = gameMap.getHalfTurnCounter() > (maxTurns * 2);
             Player[] alive = Arrays.stream(this.players).filter(Player::isAlive).toArray(Player[]::new);
             if (alive.length == 1) {
-                return endGame(alive[0]);
+                Player winner = alive[0];
+                sendGameUpdate(winner);
+                return endGame(winner);
             } else if (reachedMaxTurns) {
                 return disconnectPlayers(this.players);
             }
