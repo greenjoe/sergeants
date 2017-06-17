@@ -34,7 +34,7 @@ public class GameMap {
         if ((halfTurnCounter % 2) == 0) {
             Arrays.stream(tiles).forEach(Tile::turn);
         }
-        if ((halfTurnCounter % 25) == 0) {
+        if ((halfTurnCounter % 50) == 0) {
             Arrays.stream(tiles).forEach(Tile::round);
         }
     }
@@ -48,7 +48,11 @@ public class GameMap {
             Tile from = tiles[move.getFrom()];
             boolean armyBigEnough = from.getArmySize() > 1;
             boolean tileAndPlayerMatching = from.isOwnedBy(player.getPlayerIndex());
-            if (armyBigEnough && tileAndPlayerMatching) {
+            boolean oneStepAway = getTileAbove(from).map(tile -> tile.getTileIndex() == move.getTo()).orElse(false) ||
+                    getTileBelow(from).map(tile -> tile.getTileIndex() == move.getTo()).orElse(false) ||
+                    getTileRightOf(from).map(tile -> tile.getTileIndex() == move.getTo()).orElse(false) ||
+                    getTileLeftOf(from).map(tile -> tile.getTileIndex() == move.getTo()).orElse(false);
+            if (armyBigEnough && tileAndPlayerMatching && oneStepAway) {
                 int armySize = from.moveFrom(move.half());
                 return tiles[move.getTo()]
                         .moveTo(armySize, from.getOwnerPlayerIndex().get(), tiles)
