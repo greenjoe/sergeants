@@ -59,7 +59,7 @@ public class SimulatorFullGameTest {
 
     private void checkFinalGameState(Tile[] tiles) {
         assertEquals(CityTile.class, tiles[0].getClass());
-        assertEquals(10, tiles[0].getArmySize());
+        assertEquals(8, tiles[0].getArmySize());
         assertEquals(Optional.of(1), tiles[0].getOwnerPlayerIndex());
 
         assertEquals(CityTile.class, tiles[1].getClass());
@@ -67,7 +67,7 @@ public class SimulatorFullGameTest {
         assertEquals(Optional.of(1), tiles[1].getOwnerPlayerIndex());
 
         assertEquals(EmptyTile.class, tiles[3].getClass());
-        assertEquals(12, tiles[3].getArmySize());
+        assertEquals(11, tiles[3].getArmySize());
         assertEquals(Optional.of(1), tiles[3].getOwnerPlayerIndex());
 
         assertEquals(GeneralTile.class, tiles[8].getClass());
@@ -92,7 +92,8 @@ public class SimulatorFullGameTest {
         @Override
         public void onGameStateUpdate(GameState newGameState) {
             super.onGameStateUpdate(newGameState);
-            actions.move(3, 4);//not a valid move, should be ignored by simulator
+            actions.move(3, 4);//moving enemy, should be ignored by simulator
+            actions.move(8, 4);//moving diagonally, should be ignored by simulator
             Field field = newGameState.getTwoDimensionalArrayOfFields()[2][2];
             if (field.asVisibleField().getArmy() == 12) {
                 actions.move(8, 7);
