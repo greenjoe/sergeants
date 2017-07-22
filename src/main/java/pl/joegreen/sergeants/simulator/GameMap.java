@@ -9,6 +9,7 @@ import pl.joegreen.sergeants.simulator.viewer.ViewerMapState;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class GameMap {
 
@@ -51,10 +52,10 @@ public class GameMap {
             Tile from = tiles[move.getFrom()];
             boolean armyBigEnough = from.getArmySize() > 1;
             boolean tileAndPlayerMatching = from.isOwnedBy(player.getPlayerIndex());
-            boolean oneStepAway = getTileAbove(from).map(tile -> tile.getTileIndex() == move.getTo()).orElse(false) ||
-                    getTileBelow(from).map(tile -> tile.getTileIndex() == move.getTo()).orElse(false) ||
-                    getTileRightOf(from).map(tile -> tile.getTileIndex() == move.getTo()).orElse(false) ||
-                    getTileLeftOf(from).map(tile -> tile.getTileIndex() == move.getTo()).orElse(false);
+            boolean oneStepAway = Stream.of(getTileAbove(from), getTileBelow(from), getTileLeftOf(from), getTileRightOf(from))
+                    .filter(Optional::isPresent).map(Optional::get)
+                    .map(Tile::getTileIndex)
+                    .anyMatch(neighbourIndex -> neighbourIndex == move.getTo());
             if (armyBigEnough && tileAndPlayerMatching && oneStepAway) {
                 int armySize = from.moveFrom(move.half());
                 return tiles[move.getTo()]
