@@ -1,5 +1,6 @@
 package pl.joegreen.sergeants.simulator;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.joegreen.sergeants.api.response.GameStartApiResponse;
@@ -7,6 +8,9 @@ import pl.joegreen.sergeants.api.response.GameUpdateApiResponse;
 import pl.joegreen.sergeants.framework.model.GameResult;
 import pl.joegreen.sergeants.framework.model.api.GameStartedApiResponseImpl;
 import pl.joegreen.sergeants.framework.model.api.UpdatableGameState;
+import pl.joegreen.sergeants.simulator.viewer.FileViewerWriter;
+import pl.joegreen.sergeants.simulator.viewer.NopViewerWriter;
+import pl.joegreen.sergeants.simulator.viewer.ViewerWriter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,21 +23,22 @@ import java.util.Optional;
  * Single threaded, so all action calls must be made from the same thread.
  * Use SimulatorFactory to create an instance.
  */
+@Slf4j
 public class Simulator {
 
     private final Logger LOGGER = LoggerFactory.getLogger(Simulator.class);
     private final GameMap gameMap;
     private final Player players[];
     private final List<SimulatorListener> listeners = new ArrayList<>();
-    private final int maxTurns;
+    private final SimulatorConfiguration configuration;
 
-    Simulator(GameMap gameMap, Player[] players, int maxTurns) {
+    Simulator(GameMap gameMap, Player[] players, SimulatorConfiguration configuration) {
         if (gameMap.getGenerals().length != players.length) {
             throw new IllegalArgumentException("Game map generals and players has different length");
         }
         this.gameMap = gameMap;
         this.players = players;
-        this.maxTurns = maxTurns;
+        this.configuration = configuration;
     }
 
     /**
@@ -43,36 +48,43 @@ public class Simulator {
      */
     public Optional<Integer> start() {
         LOGGER.info("Starting match with: {}", Arrays.toString(players));
-        listeners.forEach(simulatorListener -> simulatorListener.beforeGameStart(players, gameMap));
+        try(ViewerWriter viewerWriter = createViewerWriter()) {
+            listeners.forEach(simulatorListener -> simulatorListener.beforeGameStart(players, gameMap));
+            Arrays.stream(players).forEach(p -> {
+                GameStartApiResponse startData = getStartData(p.getPlayerIndex());
+                p.getBot().onGameStarted(new GameStartedApiResponseImpl(startData));
+            });
 
-        Arrays.stream(players).forEach(p -> {
-            GameStartApiResponse startData = getStartData(p.getPlayerIndex());
-            p.getBot().onGameStarted(new GameStartedApiResponseImpl(startData));
-        });
+            Arrays.stream(players).forEach(this::setInitialGameUpdate);
 
-        Arrays.stream(players).forEach(this::setInitialGameUpdate);
+            for (; ; ) {
+                Arrays.stream(players)
+                        .map(this::sendGameUpdate)
+                        .map(gameMap::move)
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .forEach(this::endPlayer);
+                gameMap.tick();
+                viewerWriter.write(gameMap);
+                listeners.forEach(simulatorListener -> simulatorListener.afterHalfTurn(gameMap.getHalfTurnCounter(), gameMap.getTiles()));
 
-        for (; ; ) {
-            Arrays.stream(players)
-                    .map(this::sendGameUpdate)
-                    .map(gameMap::move)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .forEach(this::endPlayer);
-            gameMap.tick();
-            listeners.forEach(simulatorListener -> simulatorListener.afterHalfTurn(gameMap.getHalfTurnCounter(), gameMap.getTiles()));
-
-
-            boolean reachedMaxTurns = gameMap.getHalfTurnCounter() > (maxTurns * 2);
-            Player[] alive = Arrays.stream(this.players).filter(Player::isAlive).toArray(Player[]::new);
-            if (alive.length == 1) {
-                Player winner = alive[0];
-                sendGameUpdate(winner);
-                return endGame(winner);
-            } else if (reachedMaxTurns) {
-                return disconnectPlayers(this.players);
+                boolean reachedMaxTurns = gameMap.getHalfTurnCounter() > (configuration.getMaxTurns() * 2);
+                Player[] alive = Arrays.stream(this.players).filter(Player::isAlive).toArray(Player[]::new);
+                if (alive.length == 1) {
+                    Player winner = alive[0];
+                    sendGameUpdate(winner);
+                    return endGame(winner);
+                } else if (reachedMaxTurns) {
+                    return disconnectPlayers(this.players);
+                }
             }
         }
+    }
+
+    private ViewerWriter createViewerWriter() {
+        return configuration.getReplayFile()
+                .map(file -> (ViewerWriter) new FileViewerWriter(file))
+                .orElseGet(NopViewerWriter::new);
     }
 
     private Player sendGameUpdate(Player player) {
@@ -120,10 +132,6 @@ public class Simulator {
         GameResult gameResult = new GameResult(result, winner.getGameState(), Optional.empty());
         winner.getBot().onGameFinished(gameResult);
         return Optional.of(winner.getPlayerIndex());
-    }
-
-    public int getMaxTurns() {
-        return maxTurns;
     }
 
     public List<SimulatorListener> getListeners() {

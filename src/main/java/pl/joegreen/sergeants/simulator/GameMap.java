@@ -3,6 +3,9 @@ package pl.joegreen.sergeants.simulator;
 
 import pl.joegreen.sergeants.api.response.GameUpdateApiResponse;
 import pl.joegreen.sergeants.api.response.ScoreApiResponse;
+import pl.joegreen.sergeants.framework.model.Position;
+import pl.joegreen.sergeants.simulator.viewer.ViewerField;
+import pl.joegreen.sergeants.simulator.viewer.ViewerMapState;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -181,5 +184,18 @@ public class GameMap {
 
     int getWidth() {
         return width;
+    }
+
+
+    public static ViewerMapState toViewerMapState(GameMap map) {
+        Set<ViewerField> viewerFields = Arrays.stream(map.getTiles()).map(
+                tile -> new ViewerField(Position.fromIndex(tile.getTileIndex(), map.getWidth()),
+                        tile.getOwnerPlayerIndex().orElse(null),
+                        tile.getArmySize(),
+                        tile instanceof CityTile,
+                        tile instanceof GeneralTile,
+                        tile instanceof MountainTile)
+        ).collect(Collectors.toSet());
+        return new ViewerMapState(map.getHalfTurnCounter(), map.getHeight(), map.getWidth(), viewerFields);
     }
 }

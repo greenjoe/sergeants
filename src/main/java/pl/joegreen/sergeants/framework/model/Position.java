@@ -8,4 +8,12 @@ import lombok.experimental.Wither;
 public class Position {
     int row;
     int col;
+
+    public static Position fromIndex(int index, int columns) {
+        return new Position(index / columns, index % columns);
+    }
+
+    public int toIndex(int columns) {
+        return getCol() + getRow() * columns;
+    }
 }

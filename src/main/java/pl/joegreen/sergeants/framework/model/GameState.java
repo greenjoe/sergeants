@@ -72,11 +72,11 @@ public interface GameState extends GameStateFieldContext {
     }
 
     default Position positionFromIndex(int index) {
-        return new Position(index / getColumns(), index % getColumns());
+        return Position.fromIndex(index, getColumns());
     }
 
     default int positionToIndex(Position position) {
-        return position.getCol() + position.getRow() * getColumns();
+        return position.toIndex(getColumns());
     }
 
     default boolean isValidPosition(Position position) {

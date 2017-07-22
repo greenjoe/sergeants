@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static pl.joegreen.sergeants.simulator.SimulatorConfiguration.configuration;
 
 public class SimulatorTest {
 
@@ -22,7 +23,7 @@ public class SimulatorTest {
         Simulator simulator = SimulatorFactory.of(new GameMap(new Tile[]{
                 new GeneralTile(0, 0), new EmptyTile(1),
                 new EmptyTile(2), new GeneralTile(3, 1)
-        }, 2, 2), maxTurns, firstBotProvider, secondBotProvider);
+        }, 2, 2), configuration().withMaxTurns(maxTurns), firstBotProvider, secondBotProvider);
         simulator.start();
 
         List<GameState> gameStatesReceivedByFirstBot = firstBotProvider.lastCreatedBot.receivedGameStates;
@@ -51,7 +52,7 @@ public class SimulatorTest {
         int maxTurns = 7;
         BotInstanceCatcher<DoNothingBot> doNothingBotProvider = new BotInstanceCatcher<>(DoNothingBot::new);
 
-        Simulator simulator = SimulatorFactory.of(gameMap, maxTurns, conquerorBotProvider, doNothingBotProvider);
+        Simulator simulator = SimulatorFactory.of(gameMap, configuration().withMaxTurns(maxTurns), conquerorBotProvider, doNothingBotProvider);
         simulator.start();
         List<GameState> gameStatesReceivedByConqueror = conquerorBotProvider.lastCreatedBot.receivedGameStates;
         GameState lastGameStateReceivedByByConqueror = gameStatesReceivedByConqueror.get(gameStatesReceivedByConqueror.size() - 1);
@@ -82,7 +83,7 @@ public class SimulatorTest {
         });
         BotInstanceCatcher<DoNothingBot> doNothingBotProvider = new BotInstanceCatcher<>(DoNothingBot::new);
 
-        Simulator simulator = SimulatorFactory.of(gameMap, MANY_TURNS, conquerorBotProvider, doNothingBotProvider);
+        Simulator simulator = SimulatorFactory.of(gameMap, configuration().withMaxTurns(MANY_TURNS), conquerorBotProvider, doNothingBotProvider);
         simulator.start();
         List<GameState> gameStatesReceivedByConqueror = conquerorBotProvider.lastCreatedBot.receivedGameStates;
         GameState lastGameStateReceivedByByConqueror = gameStatesReceivedByConqueror.get(gameStatesReceivedByConqueror.size() - 1);

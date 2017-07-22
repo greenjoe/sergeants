@@ -8,6 +8,7 @@ import pl.joegreen.sergeants.framework.model.*;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
+import static pl.joegreen.sergeants.simulator.SimulatorConfiguration.configuration;
 
 
 public class SimulatorFullGameTest {
@@ -21,7 +22,7 @@ public class SimulatorFullGameTest {
         };
         GameMap gameMap = new GameMap(tiles, 3, 3);
         BotInstanceCatcher<AttackGeneralBot> attackGeneralBotProvider = new BotInstanceCatcher<>(AttackGeneralBot::new);
-        Simulator server = SimulatorFactory.of(gameMap, 200, DoSameMoveBot.forMove(0, 3), attackGeneralBotProvider);
+        Simulator server = SimulatorFactory.of(gameMap, configuration().withMaxTurns(200), DoSameMoveBot.forMove(0, 3), attackGeneralBotProvider);
         Optional<Integer> winner = server.start();
         Assert.assertTrue(winner.isPresent());
 

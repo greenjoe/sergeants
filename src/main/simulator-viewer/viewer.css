@@ -1,0 +1,15 @@
+
+footer {
+    position:fixed;
+    bottom:0;
+    background-color:black;
+    min-height:40px;
+    width:100%;
+    color:#fff;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap
+}
+
+

@@ -14,6 +14,8 @@ import java.util.Deque;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
+import static pl.joegreen.sergeants.simulator.SimulatorConfiguration.configuration;
+
 /**
  * Factory class for creating simulations
  */
@@ -24,16 +26,17 @@ public class SimulatorFactory {
         OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
+    @SafeVarargs
     public static Simulator of(GameMap gameMap, Function<Actions, Bot>... botProviders) {
-        return of(gameMap, Integer.MAX_VALUE, botProviders);
+        return of(gameMap, configuration(), botProviders);
     }
 
     @SafeVarargs
-    public static Simulator of(GameMap gameMap, int maxTurns, Function<Actions, Bot>... botProviders) {
+    public static Simulator of(GameMap gameMap, SimulatorConfiguration configuration, Function<Actions, Bot>... botProviders) {
         if (botProviders.length < 2) {
             throw new IllegalArgumentException("Cannot simulate the game with less than 2 bots");
         }
-        return new Simulator(gameMap, createPlayers(botProviders), maxTurns);
+        return new Simulator(gameMap, createPlayers(botProviders), configuration);
     }
 
     private SimulatorFactory() {

@@ -1,0 +1,46 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Sergeants Simulator Viewer</title>
+    <link rel="stylesheet" href="viewer.css?v=1.0">
+    <link rel="stylesheet" href="generals-io.css?v=1.0">
+    <script src="vue.min.js"></script>
+
+</head>
+<body>
+
+
+<script src="viewer.js?v=1.0"></script>
+
+<div id="app">
+    <table v-bind:class="['size-'+cellSize ]" v-if="states" id="map">
+        <tr v-for="row in convert(states[index]).fields">
+            <td v-for="field in row"
+                v-bind:class="[{ city: field.city, mountain:field.mountain, general:field.general}, 'color'+field.owner, ]">
+                {{field.army>0?field.army:""}}
+            </td>
+        </tr>
+    </table>
+    <footer>
+        <div>
+            <div v-if="states" style="display:flex; align-items:center">
+                <span>Turn</span>
+                    <input v-model="index" type="range" step="1" min="0" :max="states.length-1"/>
+                <span>{{convert(states[index]).tick}}</span>
+            </div>
+        </div>
+        <div>
+            <div v-if="states" style="display:flex; align-items:center">
+                <span>Size</span>
+                <input  v-model="cellSize" type="range" step="1" min="1" max="5"/>
+            </div>
+        </div>
+        <div>
+            <input type="file" id="simulatorReplayInput" @change="handleFileSelect($event)"/>
+        </div>
+    </footer>
+</div>
+</body>
+</html>
