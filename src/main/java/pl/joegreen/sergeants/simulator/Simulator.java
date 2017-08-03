@@ -1,21 +1,19 @@
 package pl.joegreen.sergeants.simulator;
 
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.joegreen.sergeants.api.response.GameStartApiResponse;
-import pl.joegreen.sergeants.api.response.GameUpdateApiResponse;
 import pl.joegreen.sergeants.framework.model.GameResult;
+import pl.joegreen.sergeants.framework.model.GameState;
 import pl.joegreen.sergeants.framework.model.api.GameStartedApiResponseImpl;
-import pl.joegreen.sergeants.framework.model.api.UpdatableGameState;
 import pl.joegreen.sergeants.simulator.viewer.FileViewerWriter;
 import pl.joegreen.sergeants.simulator.viewer.NopViewerWriter;
 import pl.joegreen.sergeants.simulator.viewer.ViewerWriter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 /**
@@ -55,11 +53,10 @@ public class Simulator {
                 p.getBot().onGameStarted(new GameStartedApiResponseImpl(startData));
             });
 
-            Arrays.stream(players).forEach(this::setInitialGameUpdate);
-
             for (; ; ) {
+                Map<Integer, PlayerStats> playersStats = calculatePlayersStats(gameMap.getTiles());
                 Arrays.stream(players)
-                        .map(this::sendGameUpdate)
+                        .map(player -> sendGameUpdate(player, playersStats))
                         .map(gameMap::move)
                         .filter(Optional::isPresent)
                         .map(Optional::get)
@@ -72,7 +69,7 @@ public class Simulator {
                 Player[] alive = Arrays.stream(this.players).filter(Player::isAlive).toArray(Player[]::new);
                 if (alive.length == 1) {
                     Player winner = alive[0];
-                    sendGameUpdate(winner);
+                    sendGameUpdate(winner, calculatePlayersStats(gameMap.getTiles()));
                     return endGame(winner);
                 } else if (reachedMaxTurns) {
                     return disconnectPlayers(this.players);
@@ -87,18 +84,11 @@ public class Simulator {
                 .orElseGet(NopViewerWriter::new);
     }
 
-    private Player sendGameUpdate(Player player) {
-        GameUpdateApiResponse update = gameMap.getUpdate(player.getPlayerIndex());
-        player.updateGameState(update);
+    private Player sendGameUpdate(Player player, Map<Integer, PlayerStats> playersStats) {
+        player.updateGameState(getGameStateForPlayer(player.getPlayerIndex(), players, gameMap, playersStats));
         return player;
     }
 
-    private void setInitialGameUpdate(Player player) {
-        int playerIndex = player.getPlayerIndex();
-        GameStartApiResponse startData = getStartData(playerIndex);
-        GameUpdateApiResponse gameUpdateApiResponses = gameMap.getUpdate(playerIndex);
-        player.setInitialGameState(UpdatableGameState.createInitialGameState(startData, gameUpdateApiResponses));
-    }
 
     private void endPlayer(PlayerKilled playerKilled) {
         Player player = players[playerKilled.getVictim()];
@@ -137,4 +127,38 @@ public class Simulator {
     public List<SimulatorListener> getListeners() {
         return listeners;
     }
+
+    GameState getGameStateForPlayer(int playerIndex, Player[] players, GameMap gameMap, Map<Integer, PlayerStats> playersStats) {
+        return new SimulatorPlayerGameState(
+                gameMap.getWidth(), gameMap.getHeight(), gameMap.getHalfTurnCounter(), players, playerIndex, getTilesVisibilitiesForPlayer(playerIndex, gameMap), playersStats
+        );
+    }
+
+    private IdentityHashMap<Tile, Boolean> getTilesVisibilitiesForPlayer(int playerIndex, GameMap gameMap) {
+        IdentityHashMap<Tile, Boolean> result = new IdentityHashMap<>();
+        Arrays.stream(gameMap.getTiles()).forEach(tile -> result.put(tile, gameMap.isVisible(playerIndex, tile)));
+        return result;
+    }
+
+    @AllArgsConstructor
+    @EqualsAndHashCode
+    static class PlayerStats {
+        public int army;
+        public int tiles;
+    }
+
+    private Map<Integer, PlayerStats> calculatePlayersStats(Tile[] tiles) {
+        Map<Integer, PlayerStats> result = new HashMap<>();
+        Arrays.stream(tiles).forEach(tile -> {
+            tile.getOwnerPlayerIndex().ifPresent(owner -> {
+                        PlayerStats playerStats = result.getOrDefault(owner, new PlayerStats(0, 0));
+                        playerStats.army += tile.getArmySize();
+                        playerStats.tiles++;
+                        result.put(owner, playerStats);
+                    }
+            );
+        });
+        return result;
+    }
+
 }

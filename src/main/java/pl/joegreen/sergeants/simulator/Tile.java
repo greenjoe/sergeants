@@ -6,7 +6,6 @@ interface Tile {
 
 
     /**
-     * Used for the first half of mapdiff.
      * Zero means unoccupied.
      */
     int getArmySize();

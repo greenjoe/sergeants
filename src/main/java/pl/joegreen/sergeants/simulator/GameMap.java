@@ -1,8 +1,6 @@
 package pl.joegreen.sergeants.simulator;
 
 
-import pl.joegreen.sergeants.api.response.GameUpdateApiResponse;
-import pl.joegreen.sergeants.api.response.ScoreApiResponse;
 import pl.joegreen.sergeants.framework.model.Position;
 import pl.joegreen.sergeants.simulator.viewer.ViewerField;
 import pl.joegreen.sergeants.simulator.viewer.ViewerMapState;
@@ -17,7 +15,6 @@ public class GameMap {
     private int halfTurnCounter = 0;
     private final int width;
     private final int height;
-
 
     GameMap(Tile[] tiles, int height, int width) {
         if ((height * width) != tiles.length) {
@@ -75,53 +72,7 @@ public class GameMap {
         return playerKilled;
     }
 
-    GameUpdateApiResponse getUpdate(int playerIndex) {
-        int[] mapDiff = getMapDiff(playerIndex);
-        int[] citiesDiff = getCitiesDiff();
-        int[] generals = getGenerals();
-        ScoreApiResponse[] scores = new ScoreApiResponse[0];
-        double[] stars = new double[0];
-        return new GameUpdateApiResponse(halfTurnCounter, mapDiff, citiesDiff, generals, 0, scores, stars);
-    }
 
-    private int[] getMapDiff(int playerIndex) {
-        List<Integer> mapDiff = new ArrayList<>();
-        //invalidate whole map diff and send a complete update because no need to save bandwidth
-        mapDiff.add(0);//this means client has zero correct values
-        mapDiff.add(tiles.length * 2 + 2); //this is number of corrected values
-        mapDiff.add(width);
-        mapDiff.add(height);
-
-        //army size
-        for (Tile tile : tiles) {
-            int armySize = isVisible(playerIndex, tile) ? tile.getArmySize() : 0;
-            mapDiff.add(armySize);
-        }
-
-        //terrain
-        for (Tile tile : tiles) {
-            boolean visible = isVisible(playerIndex, tile);
-            TerrainType terrain = tile.getTerrainType(visible);
-            mapDiff.add(terrain.intValue);
-        }
-        return mapDiff.stream().mapToInt(Integer::intValue).toArray();
-    }
-
-    /**
-     * Returns all cities, visible and fogged. This is not a problem since bot will still receive tile as fogged obstacle (-4).
-     *
-     * @return list of tileIndex where a city is located
-     */
-    private int[] getCitiesDiff() {
-        List<Integer> allCities = Arrays.stream(tiles)
-                .filter(tile -> tile.getClass() == CityTile.class)
-                .map(Tile::getTileIndex)
-                .collect(Collectors.toList());
-
-        allCities.add(0, allCities.size()); //second element = wrong
-        allCities.add(0, 0);//first element = zero correct
-        return allCities.stream().mapToInt(i -> i).toArray();
-    }
 
     /**
      * Returns all generals, visible and fogged. This is not a problem since bot will still receive tile as fogged (-3).
@@ -136,7 +87,7 @@ public class GameMap {
                 .toArray();
     }
 
-    private boolean isVisible(int playerIndex, Tile tile) {
+    public boolean isVisible(int playerIndex, Tile tile) {
         return tile.isOwnedBy(playerIndex) || getSurroundingTiles(tile).stream().anyMatch(t -> t.isOwnedBy(playerIndex));
     }
 

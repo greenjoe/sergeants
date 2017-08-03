@@ -1,9 +1,7 @@
 package pl.joegreen.sergeants.simulator;
 
-import pl.joegreen.sergeants.api.response.GameUpdateApiResponse;
 import pl.joegreen.sergeants.framework.Bot;
 import pl.joegreen.sergeants.framework.model.GameState;
-import pl.joegreen.sergeants.framework.model.api.UpdatableGameState;
 
 import java.util.Deque;
 
@@ -12,7 +10,7 @@ class Player {
     private final int playerIndex;
     private final Bot bot;
     private final Deque<Move> moves;
-    private UpdatableGameState gameState;
+    private GameState gameState;
     private boolean dead = false;
 
 
@@ -35,12 +33,8 @@ class Player {
         return gameState;
     }
 
-    public void setInitialGameState(UpdatableGameState gameState) {
+    public void updateGameState(GameState gameState) {
         this.gameState = gameState;
-    }
-
-    public void updateGameState(GameUpdateApiResponse gameUpdateApiResponses) {
-        gameState = gameState.update(gameUpdateApiResponses);
         bot.onGameStateUpdate(gameState);
     }
 

@@ -32,6 +32,13 @@ public class SimulatorTest {
         assertEquals(4, lastGameStateReceivedByFirstBot.getVisibleFields().size());
         assertEquals(1, lastGameStateReceivedByFirstBot.getVisibleFields().stream().filter(VisibleField::isOwnedByMe).count());
         assertEquals(turnToSecondHalfTick(maxTurns), lastGameStateReceivedByFirstBot.getTurn());
+
+        assertEquals(2, lastGameStateReceivedByFirstBot.getPlayers().size());
+        lastGameStateReceivedByFirstBot.getPlayers().forEach(player -> {
+            assertEquals(6, player.getArmy().intValue());
+            assertEquals(1, player.getFields().intValue());
+        });
+
     }
 
     @Test
@@ -59,10 +66,12 @@ public class SimulatorTest {
 
         List<VisibleField> fieldsOwnedByConqueror = lastGameStateReceivedByByConqueror.getVisibleFields().stream().filter(VisibleField::isOwnedByMe).collect(Collectors.toList());
         assertEquals(2, fieldsOwnedByConqueror.size());
+        assertEquals(2, lastGameStateReceivedByByConqueror.getMyPlayer().getFields().intValue());
         int conquerorGeneralArmy = fieldsOwnedByConqueror.stream().filter(VisibleField::isGeneral).findFirst().get().getArmy();
         assertEquals(2, conquerorGeneralArmy);
         int cityArmy = fieldsOwnedByConqueror.stream().filter(VisibleField::isCity).findFirst().get().getArmy();
         assertEquals(2, cityArmy);
+        assertEquals(4, lastGameStateReceivedByByConqueror.getMyPlayer().getArmy().intValue());
         assertEquals(turnToSecondHalfTick(maxTurns), lastGameStateReceivedByByConqueror.getTurn());
     }
 
@@ -89,7 +98,9 @@ public class SimulatorTest {
         GameState lastGameStateReceivedByByConqueror = gameStatesReceivedByConqueror.get(gameStatesReceivedByConqueror.size() - 1);
 
         List<VisibleField> fieldsOwnedByConqueror = lastGameStateReceivedByByConqueror.getVisibleFields().stream().filter(VisibleField::isOwnedByMe).collect(Collectors.toList());
-        assertEquals(4, fieldsOwnedByConqueror.size());;
+        assertEquals(4, fieldsOwnedByConqueror.size());
+        assertEquals(4, lastGameStateReceivedByByConqueror.getMyPlayer().getFields().intValue());
+        assertEquals(3, fieldsOwnedByConqueror.stream().filter(VisibleField::isCity).count());
         int conqueredGeneralArmy = fieldsOwnedByConqueror.stream().filter(visibleField -> visibleField.getIndex() == 3).findFirst().get().getArmy();
         assertEquals(99, conqueredGeneralArmy);
         assertEquals(turnToSecondHalfTick(1), lastGameStateReceivedByByConqueror.getTurn());
