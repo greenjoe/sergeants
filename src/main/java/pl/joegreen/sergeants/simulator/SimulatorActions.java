@@ -28,7 +28,7 @@ class SimulatorActions implements Actions {
 
     @Override
     public void move(Field fieldFrom, Field fieldTo, boolean moveHalf) {
-        if (!fieldFrom.getNeighbours().contains(fieldTo)) {
+        if (!fieldTo.getPosition().isMovableFrom(fieldFrom.getPosition())) {
             LOGGER.error("Moving between fields that are not neighbours, it probably has no effect. {} ==> {}", fieldFrom, fieldTo);
         }
         move(fieldFrom.getIndex(), fieldTo.getIndex(), moveHalf);
