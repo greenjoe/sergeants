@@ -29,7 +29,7 @@ class CityTile extends AbstractTile {
 
     @Override
     public void transfer(int playerIndex) {
-        armySize /= 2;
+        armySize = (armySize + 1) / 2;
         this.playerIndex = Optional.of(playerIndex);
     }
 }

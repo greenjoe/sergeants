@@ -67,7 +67,7 @@ public class SimulatorFullGameTest {
         assertEquals(Optional.of(1), tiles[1].getOwnerPlayerIndex());
 
         assertEquals(EmptyTile.class, tiles[3].getClass());
-        assertEquals(11, tiles[3].getArmySize());
+        assertEquals(12, tiles[3].getArmySize());
         assertEquals(Optional.of(1), tiles[3].getOwnerPlayerIndex());
 
         assertEquals(GeneralTile.class, tiles[8].getClass());
