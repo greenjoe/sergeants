@@ -42,6 +42,50 @@ public class SimulatorTest {
     }
 
     @Test
+    public void test2x2MapMovingEnemyArmyShouldNotBePossible() throws Exception {
+        BotInstanceCatcher<DoSameMoveBot> invalidMoveBotProvider = new BotInstanceCatcher<>(actions-> new DoSameMoveBot(actions, 3, 2));
+        BotInstanceCatcher<DoNothingBot> secondBotProvider = new BotInstanceCatcher<>(DoNothingBot::new);
+        int maxTurns = 5;
+        Simulator simulator = SimulatorFactory.of(new GameMap(new Tile[]{
+                new GeneralTile(0, 0), new EmptyTile(1),
+                new EmptyTile(2), new GeneralTile(3, 1)
+        }, 2, 2), configuration().withMaxTurns(maxTurns), invalidMoveBotProvider, secondBotProvider);
+        simulator.start();
+
+        List<GameState> gameStatesReceivedBySecondBot = secondBotProvider.lastCreatedBot.receivedGameStates;
+        GameState lastGameStateReceivedBySecondBot = gameStatesReceivedBySecondBot.get(gameStatesReceivedBySecondBot.size() - 1);
+
+        assertEquals(1, lastGameStateReceivedBySecondBot.getVisibleFields().stream().filter(VisibleField::isOwnedByMe).count());
+        lastGameStateReceivedBySecondBot.getPlayers().forEach(player -> {
+            assertEquals(6, player.getArmy().intValue());
+            assertEquals(1, player.getFields().intValue());
+        });
+    }
+
+    @Test
+    public void test2x2MapMovingDiagonallyShouldNotBePossible() throws Exception {
+        BotInstanceCatcher<DoSameMoveBot> invalidMoveBotProvider = new BotInstanceCatcher<>(actions-> new DoSameMoveBot(actions, 0, 3));
+        BotInstanceCatcher<DoNothingBot> secondBotProvider = new BotInstanceCatcher<>(DoNothingBot::new);
+        int maxTurns = 5;
+        Simulator simulator = SimulatorFactory.of(new GameMap(new Tile[]{
+                new GeneralTile(0, 0), new EmptyTile(1),
+                new EmptyTile(2), new GeneralTile(3, 1)
+        }, 2, 2), configuration().withMaxTurns(maxTurns), invalidMoveBotProvider, secondBotProvider);
+        simulator.start();
+
+        List<GameState> gameStatesReceivedBySecondBot = secondBotProvider.lastCreatedBot.receivedGameStates;
+        GameState lastGameStateReceivedBySecondBot = gameStatesReceivedBySecondBot.get(gameStatesReceivedBySecondBot.size() - 1);
+
+        assertEquals(1, lastGameStateReceivedBySecondBot.getVisibleFields().stream().filter(VisibleField::isOwnedByMe).count());
+        lastGameStateReceivedBySecondBot.getPlayers().forEach(player -> {
+            assertEquals(6, player.getArmy().intValue());
+            assertEquals(1, player.getFields().intValue());
+        });
+    }
+
+
+
+    @Test
     public void test2x2CityTakeover() throws Exception {
         GameMap gameMap = new GameMap(new Tile[]{
                 new GeneralTile(0, 0), new CityTile(1, 5),
