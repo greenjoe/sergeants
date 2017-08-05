@@ -14,7 +14,7 @@ Add maven dependency
        <dependency>
             <groupId>pl.joegreen</groupId>
             <artifactId>sergeants</artifactId>
-            <version>0.4</version>
+            <version>0.5</version>
         </dependency>
 ```
 
@@ -85,6 +85,20 @@ Run the class and wait for results. If constructor is used as a bot provider new
 `Games.playAsynchronously` method can be used to play multiple games (with different user identifiers) at the same time as it doesn't
 block a calling thread.
 
+## Simulator 
+Thanks to contributions from @nosslin579 it is also possible to simulate a game between two bots locally, without connecting to the actual server. It might be a nice tool to quickly get feedback while developing a bot.
+
+```
+        SimulatorFactory.of(SimulatorFactory.create2PlayerMap(),
+                SimulatorConfiguration.configuration()
+                        .withMaxTurns(2000)
+                        .withReplayFile(new File("C:\\Users\\greenjoe\\Desktop\\myReplay.json")),
+                MyBot::new, MyBot::new).start();
+```
+
+The replay file is optional and, if provided, will be used to save a full replay of the simulated game. The replay can be then viewed in the sergeants simulator viewer, which can be found at http://sergeants-simulator-viewer.joegreen.pl/ (or in `src/main/simulator-viewer` directory of this repository). 
+
+Please bear in mind that Simulator's behavior may not fully reflect the behavior of the actual server. If you see any differences, please raise an issue. 
 
 # Low-level API
 
