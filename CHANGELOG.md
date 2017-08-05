@@ -1,3 +1,6 @@
+#0.6
+* Small fix: warn that move has no effect now relies only on position, not on field instance.
+
 #0.5
 * Adding simulator contributed by nosslin579. It is now possible to simulate a game between bots locally. 
 
