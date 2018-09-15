@@ -1,3 +1,7 @@
+# Project status
+
+I've stopped playing generals.io and I don't maintain the project anymore. I cannot guarantee that it still works with the newest versions of the game. 
+
 # Sergeants 
 
 Sergeants is a framework for creating bots for the generals.io game. It consists of two packages:
@@ -96,7 +100,7 @@ Thanks to contributions from @nosslin579 it is also possible to simulate a game 
                 MyBot::new, MyBot::new).start();
 ```
 
-The replay file is optional and, if provided, will be used to save a full replay of the simulated game. The replay can be then viewed in the sergeants simulator viewer, which can be found at http://sergeants-simulator-viewer.joegreen.pl/ (or in `src/main/simulator-viewer` directory of this repository). 
+The replay file is optional and, if provided, will be used to save a full replay of the simulated game. The replay can be then viewed in the sergeants simulator viewer, which can be found in `src/main/simulator-viewer` directory of this repository. 
 
 Please bear in mind that Simulator's behavior may not fully reflect the behavior of the actual server. If you see any differences, please raise an issue. 
 
@@ -111,14 +115,3 @@ The following example shows how to set the username using the `GeneralsApi` clas
                 generalsApi.setUsername("userId", "userName"));
         generalsApi.connect();
 ```
-
-# Versions & contributing
-
-Please consider all versions below 1.0 "beta". Beta means that the project is new and wasn't tested in production too much,
-so the probability of discovering bugs and usability issues is higher. It's possible that bigger architecture changes 
-will be needed and the backward interface compatibility with bots written for previous versions may be broken. 
-
-Well-described issues and pull requests are welcome. Please stick to the formatting conventions,
-which are basically Intellij Idea defaults. Lombok plugin may be needed to compile the project in an IDE.
-
-[![Build Status](https://travis-ci.org/greenjoe/sergeants.svg?branch=master)](https://travis-ci.org/greenjoe/sergeants)
